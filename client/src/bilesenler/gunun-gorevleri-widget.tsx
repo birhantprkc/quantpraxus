@@ -1,36 +1,92 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Task } from "@shared/sema";
-import { CheckCircle2, Circle, Plus, ArrowRight } from "lucide-react";
+import { CheckCircle2, Circle, Plus, Calendar, PartyPopper } from "lucide-react";
 import { apiRequest, sorguIstemcisi } from "@/kutuphane/sorguIstemcisi";
 import { useToast } from "@/hooks/use-toast";
-import { useState, useMemo } from "react";
-import { Link } from "wouter";
+import { useState, useEffect, useMemo } from "react";
 
 export function TodaysTasksWidget() {
   const { toast } = useToast();
   const [celebratingTask, setCelebratingTask] = useState<string | null>(null);
-
+  const [showCompletionBar, setShowCompletionBar] = useState(false);
+  
+  // Kategori isimlerini düzgün formatta gösterecek fonksiyon
   const getCategoryText = (category: string) => {
     switch (category) {
-      case "genel": return "Genel";
-      case "turkce": return "Türkçe";
-      case "paragraf": return "Paragraf";
-      case "sosyal": return "Sosyal";
-      case "matematik": return "Matematik";
-      case "problemler": return "Problemler";
-      case "fizik": return "Fizik";
-      case "kimya": return "Kimya";
-      case "biyoloji": return "Biyoloji";
-      case "tyt-geometri": return "Geometri";
-      case "ayt-geometri": return "AYT Geometri";
-      case "ayt-matematik": return "AYT Matematik";
-      case "ayt-fizik": return "AYT Fizik";
-      case "ayt-kimya": return "AYT Kimya";
-      case "ayt-biyoloji": return "AYT Biyoloji";
-      default: return category;
+      case "genel":
+        return "Genel";
+      case "turkce":
+        return "Türkçe";
+      case "paragraf":
+        return "Paragraf";
+      case "sosyal":
+        return "Sosyal Bilimler";
+      case "matematik":
+        return "TYT Matematik";
+      case "problemler":
+        return "Problemler";
+      case "fizik":
+        return "TYT Fizik";
+      case "kimya":
+        return "TYT Kimya";
+      case "biyoloji":
+        return "TYT Biyoloji";
+      case "tyt-geometri":
+        return "TYT Geometri";
+      case "ayt-geometri":
+        return "AYT Geometri";
+      case "ayt-matematik":
+        return "AYT Matematik";
+      case "ayt-fizik":
+        return "AYT Fizik";
+      case "ayt-kimya":
+        return "AYT Kimya";
+      case "ayt-biyoloji":
+        return "AYT Biyoloji";
+      default:
+        return category;
     }
   };
 
+  // Kategori badge renk sınıflarını döndüren fonksiyon
+  const getCategoryBadgeClass = (category: string) => {
+    switch (category) {
+      case "genel":
+        return "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200";
+      case "turkce":
+        return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200";
+      case "paragraf":
+        return "bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-200 border border-cyan-300";
+      case "sosyal":
+        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
+      case "matematik":
+        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
+      case "problemler":
+        return "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200 border border-amber-300";
+      case "fizik":
+        return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200";
+      case "kimya":
+        return "bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200";
+      case "biyoloji":
+        return "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200";
+      case "tyt-geometri":
+        return "bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200";
+      case "ayt-geometri":
+        return "bg-violet-100 text-violet-800 dark:bg-violet-900 dark:text-violet-200 border border-violet-300";
+      case "ayt-matematik":
+        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 border border-red-300";
+      case "ayt-fizik":
+        return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 border border-orange-300";
+      case "ayt-kimya":
+        return "bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200 border border-pink-300";
+      case "ayt-biyoloji":
+        return "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200 border border-emerald-300";
+      default:
+        return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200";
+    }
+  };
+  
+  // Bugünün tarihini YYYY-AA-BB biçiminde al (Türkiye saat dilimi)
   const getTurkeyDateString = () => {
     const now = new Date();
     const turkeyTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Istanbul' }));
@@ -40,7 +96,7 @@ export function TodaysTasksWidget() {
     return `${year}-${month}-${day}`;
   };
   const todayStr = getTurkeyDateString();
-
+  
   const { data: todaysData, isLoading } = useQuery<{
     date: string;
     dayNumber: number;
@@ -58,38 +114,61 @@ export function TodaysTasksWidget() {
   });
 
   const toggleTaskMutation = useMutation({
-    mutationFn: (taskId: string) =>
+    mutationFn: (taskId: string) => 
       apiRequest("PATCH", `/api/tasks/${taskId}/toggle`),
     onSuccess: (_, taskId) => {
+      // Görev tamamlandı mı kontrol et - filtrelenmemiş listeden al
       const task = allTasks.find(t => t.id === taskId);
       const wasCompleted = task?.completed;
-
+      
+      // Tamamlanmayan görevler için hemen güncelle
       if (wasCompleted) {
         sorguIstemcisi.invalidateQueries({ queryKey: ["/api/calendar", todayStr] });
         sorguIstemcisi.invalidateQueries({ queryKey: ["/api/tasks"] });
       }
-
+      
+      // Eğer görev şimdi tamamlandıysa celebration göster
       if (!wasCompleted) {
         setCelebratingTask(taskId);
-        toast({ title: "Tebrikler!", description: "Görev tamamlandı." });
+        setShowCompletionBar(true);
+        
+        toast({
+          title: "🎉 Tebrikler!",
+          description: "Görev başarıyla tamamlandı!",
+        });
+
+        // 1 saniye sonra celebration'ı kaldır ve görev listesini yenile
         setTimeout(() => {
           setCelebratingTask(null);
+          setShowCompletionBar(false);
+          // Görev tamamlandıktan 1 saniye sonra listeden kaldırılacak
           sorguIstemcisi.invalidateQueries({ queryKey: ["/api/calendar", todayStr] });
           sorguIstemcisi.invalidateQueries({ queryKey: ["/api/tasks"] });
-        }, 800);
+        }, 1000);
       } else {
-        toast({ title: "Görev güncellendi", description: "Durum değiştirildi." });
+        toast({
+          title: "Görev güncellendi",
+          description: "Görev durumu başarıyla değiştirildi.",
+        });
       }
     },
     onError: () => {
-      toast({ title: "Hata", description: "Görev durumu değiştirilemedi.", variant: "destructive" });
+      toast({
+        title: "Hata",
+        description: "Görev durumu değiştirilemedi.",
+        variant: "destructive",
+      });
     },
   });
 
+  // Bugün için: Sadece tamamlanmamış aktif görevleri göster
+  // Tamamlanan, arşivlenen ve silinen görevler Bugün Yapılacaklar'da görünmez
   const allTasks = todaysData?.tasks || [];
-
+  
+  // localStorage'dan taskOrder'ı oku ve görevleri sırala - useMemo ile optimize edildi
   const tasks = useMemo(() => {
     const tasksUnordered = allTasks.filter(task => !task.completed && !task.archived && !task.deleted);
+    
     try {
       const savedOrder = localStorage.getItem('taskOrder');
       if (savedOrder) {
@@ -104,125 +183,172 @@ export function TodaysTasksWidget() {
         });
       }
       return tasksUnordered;
-    } catch {
+    } catch (error) {
+      console.error('Error loading task order:', error);
       return tasksUnordered;
     }
   }, [todaysData]);
-
+  
+  // Toplam sayı: Sadece aktif görevler (arşivlenmemiş + silinmemiş)
   const activeTasks = allTasks.filter(task => !task.archived && !task.deleted);
   const completedCount = activeTasks.filter(task => task.completed).length;
   const totalCount = activeTasks.length;
 
   if (isLoading) {
     return (
-      <div className="rounded-xl border border-border/20 bg-card/30 p-4">
-        <h3 className="text-sm font-semibold text-foreground mb-3">Bugünün Planı</h3>
-        <div className="animate-pulse space-y-2.5">
-          <div className="h-4 bg-muted/40 rounded w-3/4"></div>
-          <div className="h-3 bg-muted/30 rounded w-1/2"></div>
+      <div className="bg-card rounded-xl border border-border p-6 transition-colors duration-300 h-full">
+        <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center">
+          <Calendar className="h-5 w-5 mr-2 text-primary" />
+          Bugün Yapılacaklar
+        </h3>
+        <div className="animate-pulse">
+          <div className="h-4 bg-muted rounded mb-2"></div>
+          <div className="h-3 bg-muted rounded w-2/3"></div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="rounded-xl border border-border/20 bg-card/30 flex flex-col relative overflow-hidden">
-      <div className="flex items-center justify-between px-4 pt-3.5 pb-2">
-        <h3 className="text-sm font-semibold text-foreground">Bugünün Planı</h3>
-        <div className="text-xs font-medium text-muted-foreground tabular-nums" data-testid="text-today-counts">
+    <div className="bg-card rounded-xl border border-border p-6 transition-colors duration-300 h-full flex flex-col relative overflow-hidden">
+      {/* Tamamlanma Çubuğu - Görev tamamlandığında gösterilir */}
+      {showCompletionBar && (
+        <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-green-500 via-emerald-500 to-green-500 h-2 z-10 animate-pulse">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-ping"></div>
+        </div>
+      )}
+      
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold text-foreground flex items-center">
+          <Calendar className="h-5 w-5 mr-2 text-primary" />
+          Bugün Yapılacaklar
+        </h3>
+        <div className="text-sm text-muted-foreground bg-muted/50 rounded-full px-3 py-1" data-testid="text-today-counts">
           {completedCount}/{totalCount}
         </div>
       </div>
 
       {tasks.length === 0 ? (
-        <div className="flex flex-col items-center justify-center px-5 py-5 text-center">
-          <p className="text-sm font-medium text-foreground/80">Henüz planlanmış bir çalışma yok.</p>
-          <p className="text-xs text-muted-foreground mt-1">Bugünün planını oluştur.</p>
-          <Link href="/tasks">
-            <button className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors border border-primary/20 rounded-lg px-3 py-1.5 hover:bg-primary/5">
-              Plan oluştur
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </Link>
+        <div className="text-center py-8 text-muted-foreground">
+          <Calendar className="h-8 w-8 mx-auto mb-2 opacity-50" />
+          <p className="text-sm">Bugün hiç aktivite tamamlanmamış !</p>
+          <p className="text-xs mt-1">Bugün için planlanan görevler henüz yok</p>
         </div>
       ) : (
         <>
-          {/* Progress bar — subtle */}
-          <div className="px-4 pb-2">
-            <div className="w-full bg-muted/40 rounded-full h-[3px]">
-              <div
-                className="bg-primary h-[3px] rounded-full transition-all duration-500"
-                style={{ width: `${totalCount > 0 ? (completedCount / totalCount) * 100 : 0}%` }}
-              />
-            </div>
+          {/* İlerleme çubuğu */}
+          <div className="w-full bg-secondary rounded-full h-2 mb-4">
+            <div 
+              className="bg-gradient-to-r from-primary to-primary/80 h-2 rounded-full transition-all duration-500"
+              style={{ width: `${totalCount > 0 ? (completedCount / totalCount) * 100 : 0}%` }}
+            ></div>
           </div>
 
-          <div className={`space-y-2 px-4 pb-3.5 ${tasks.length > 6 ? 'overflow-y-auto max-h-[280px]' : ''} custom-scrollbar`}>
+          {/* Görev Listesi - Kutunun en altına kadar uzar, en az 10 görev gösterir */}
+          <div className={`space-y-3 flex-1 min-h-0 max-h-[900px] ${tasks.length > 9 ? 'overflow-y-auto' : 'overflow-hidden'} custom-scrollbar`}>
             {tasks.map((task) => (
               <div
                 key={task.id}
-                className={`flex items-start gap-2.5 p-2.5 rounded-lg border transition-all duration-200 relative ${
-                  celebratingTask === task.id
-                    ? 'bg-primary/5 border-primary/20'
-                    : task.completed
-                    ? 'bg-muted/15 border-border/15'
-                    : 'bg-background/30 border-border/15 hover:border-border/30'
+                className={`flex items-start gap-3 p-3 rounded-lg border transition-all duration-200 hover:bg-muted/50 relative ${
+                  celebratingTask === task.id 
+                    ? 'bg-gradient-to-r from-green-100/80 to-emerald-100/80 dark:from-green-900/40 dark:to-emerald-900/40 border-green-300 dark:border-green-600 scale-105 shadow-lg' 
+                    : task.completed 
+                    ? 'bg-muted/30 border-muted' 
+                    : 'bg-background border-border/50 hover:border-border'
                 }`}
                 data-testid={`list-task-${task.id}`}
               >
-                <div
-                  className="absolute left-0 top-0 bottom-0 w-[2px] rounded-l-lg"
-                  style={{ backgroundColor: task.color || 'hsl(262 72% 62%)' }}
+                {!task.completed && (
+                  <div 
+                    className="absolute inset-0 rounded-lg pointer-events-none"
+                    style={{
+                      background: `linear-gradient(to right, ${task.color || '#8B5CF6'}15, transparent)`,
+                      animation: 'breathe 3s ease-in-out infinite'
+                    }}
+                  />
+                )}
+                <div 
+                  className="absolute left-0 top-0 bottom-0 w-1 rounded-l-lg"
+                  style={{
+                    backgroundColor: task.color || '#8B5CF6',
+                    animation: !task.completed ? 'breathe 3s ease-in-out infinite' : undefined
+                  }}
                 />
+                {/* Kutlama efekti(konfeti) - geliştirilmiş */}
+                {celebratingTask === task.id && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-green-400/30 to-emerald-400/30 animate-pulse rounded-lg pointer-events-none">
+                    <div className="absolute top-2 right-2 animate-bounce">
+                      <PartyPopper className="h-5 w-5 text-green-600 drop-shadow-lg" />
+                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-ping"></div>
+                  </div>
+                )}
                 <button
                   onClick={() => toggleTaskMutation.mutate(task.id)}
-                  className={`flex-shrink-0 mt-0.5 transition-all duration-200 ${
-                    task.completed
-                      ? 'text-primary'
-                      : 'text-muted-foreground hover:text-primary'
+                  className={`flex-shrink-0 transition-all duration-300 transform hover:scale-110 ${
+                    task.completed 
+                      ? 'text-green-600 hover:text-green-500 drop-shadow-md' 
+                      : 'text-muted-foreground hover:text-primary hover:drop-shadow-md'
                   }`}
                   disabled={toggleTaskMutation.isPending}
                   data-testid={`button-toggle-task-${task.id}`}
                 >
                   {task.completed ? (
-                    <CheckCircle2 className="h-4 w-4" />
+                    <CheckCircle2 className="h-5 w-5 animate-in fade-in-0 zoom-in-95 duration-200" />
                   ) : (
-                    <Circle className="h-4 w-4" />
+                    <Circle className="h-5 w-5 hover:animate-pulse" />
                   )}
                 </button>
-
+                
                 <div className="flex-1 min-w-0">
-                  <div className={`text-[13px] font-medium leading-tight ${
-                    task.completed ? 'line-through text-muted-foreground' : 'text-foreground'
-                  }`}>
-                    {task.title}
+                  <div className="flex items-center gap-2">
+                    <div className={`font-medium text-sm transition-all duration-200 ${
+                      task.completed 
+                        ? 'line-through text-muted-foreground' 
+                        : 'text-foreground'
+                    }`}>
+                      {task.title}
+                    </div>
                   </div>
-
-                  <div className="flex items-center gap-1.5 mt-1.5">
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted/30 text-muted-foreground font-medium">
+                  
+                  {task.description && (
+                    <div className={`text-xs mt-1 transition-all duration-200 ${
+                      task.completed 
+                        ? 'line-through text-muted-foreground/70' 
+                        : 'text-muted-foreground'
+                    }`}>
+                      {task.description.length > 80 
+                        ? `${task.description.substring(0, 80)}...` 
+                        : task.description}
+                    </div>
+                  )}
+                  
+                  <div className="flex items-center gap-2 mt-2">
+                    <span className={`text-xs px-2 py-1 rounded-full ${
+                      task.priority === 'high' 
+                        ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                        : task.priority === 'medium'
+                        ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                        : 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+                    }`}>
+                      {task.priority === 'high' ? 'Yüksek' : task.priority === 'medium' ? 'Orta' : 'Düşük'}
+                    </span>
+                    
+                    <span className={`text-xs px-2 py-1 rounded-full ${getCategoryBadgeClass(task.category)}`}>
                       {getCategoryText(task.category)}
                     </span>
-                    {task.priority === 'high' && (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-destructive/10 text-destructive font-medium">
-                        Yüksek
-                      </span>
-                    )}
-                    {task.priority === 'medium' && (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 font-medium">
-                        Orta
-                      </span>
-                    )}
                   </div>
                 </div>
               </div>
             ))}
           </div>
 
+          {/* Özet */}
           {tasks.length > 0 && (
-            <div className="px-4 py-2 border-t border-border/10">
-              <div className="text-[11px] text-muted-foreground text-center">
-                {completedCount === totalCount
-                  ? "Tüm görevler tamamlandı"
+            <div className="mt-auto pt-4 border-t border-border">
+              <div className="text-xs text-muted-foreground text-center">
+                {completedCount === totalCount 
+                  ? "🎉 Tüm günlük görevler tamamlandı!" 
                   : `${totalCount - completedCount} görev kaldı`
                 }
               </div>
@@ -233,3 +359,4 @@ export function TodaysTasksWidget() {
     </div>
   );
 }
+
