@@ -1,10 +1,9 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
-import { useLocation } from "wouter";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { Header } from "@/bilesenler/baslik";
-import { EnhancedWeatherWidget } from "@/bilesenler/gelismis-hava-durumu-widget";
+import { CompactWeatherWidget } from "@/bilesenler/kompakt-hava-durumu";
 import { CountdownWidget } from "@/bilesenler/geri-sayim-widget";
 import { TodaysTasksWidget } from "@/bilesenler/gunun-gorevleri-widget";
-import { Calendar, Clock, ChevronLeft, ChevronRight, Mail, Lock, Unlock, TrendingUp } from "lucide-react";
+import { Calendar, ChevronLeft, ChevronRight, Mail, Lock, Unlock, Target } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Task, QuestionLog, ExamResult } from "@shared/sema";
 import { Button } from "@/bilesenler/arayuz/button";
@@ -18,15 +17,33 @@ import {
   type DayActivities, type ActivityFilter,
 } from "@/bilesenler/aktivite-listesi";
 
-const getTurkeyDate = (): string => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Istanbul" }).format(new Date());
 const dateToTurkeyString = (date: Date | string): string => {
   const d = typeof date === "string" ? new Date(date) : date;
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Istanbul" }).format(d);
 };
 
+function useReveal() {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) entry.target.classList.add("revealed");
+        });
+      },
+      { threshold: 0.08, rootMargin: "0px 0px -40px 0px" }
+    );
+    el.querySelectorAll(".reveal").forEach((child) => observer.observe(child));
+    return () => observer.disconnect();
+  }, []);
+  return ref;
+}
+
 export default function Homepage() {
-  const [, navigate] = useLocation();
   const { toast } = useToast();
+  const sectionRef = useReveal();
 
   const getTodayDateString = () => {
     const now = new Date();
@@ -42,7 +59,6 @@ export default function Homepage() {
 
   const { expandedTasks, toggleTask, expandedQuestionLogs, toggleQuestionLog, expandedExams, toggleExam } = useExpandState();
 
-  // Queries
   const { data: calendarData } = useQuery<{ date: string; dayNumber: number; daysRemaining: number; tasks: Task[]; tasksCount: number }>({
     queryKey: ["/api/calendar", selectedDate],
     queryFn: async () => {
@@ -125,7 +141,6 @@ export default function Homepage() {
     },
   });
 
-  // Auto report Sunday 23:59
   useEffect(() => {
     const check = () => {
       const t = new Date(new Date().toLocaleString("en-US", { timeZone: "Europe/Istanbul" }));
@@ -262,47 +277,61 @@ export default function Homepage() {
     }).format(new Date());
   }, []);
 
-  // Selected date activities
   const selectedActivities = useMemo(() => getActivitiesForDate(new Date(selectedDate + "T12:00:00")), [selectedDate, getActivitiesForDate]);
   const todayDateStr = getTodayDateString();
-  const isPast = selectedDate < todayDateStr;
   const isToday = selectedDate === todayDateStr;
   const isFuture = selectedDate > todayDateStr;
 
   return (
-    <div className="min-h-screen bg-background transition-colors duration-300">
+    <div className="min-h-screen bg-background ambient-bg transition-colors duration-300">
       <Header hideClockOnHomepage />
 
-      {/* Hero */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-8">
-        <div className="flex flex-col gap-6">
-          <div className="flex flex-col gap-1.5">
-            <span className="text-xs font-medium uppercase tracking-widest text-primary">{formattedDate}</span>
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
-              {greeting}.
-            </h1>
-            <p className="text-base text-muted-foreground max-w-xl">
-              QuantPraxus'a hoş geldin. Bugünkü hedeflerine odaklan, ilerlemeni takip et.
-            </p>
+      {/* Hero + Countdown — editorial composition */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-10 pb-6">
+        <div className="flex flex-col gap-6 animate-fade-in-up">
+          {/* Greeting + contextual status */}
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+            <div className="flex flex-col gap-1.5">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary/70">
+                {formattedDate}
+              </span>
+              <h1 className="text-3xl sm:text-4xl lg:text-[2.75rem] font-bold tracking-tight text-foreground leading-[1.1]">
+                {greeting}.
+              </h1>
+              <p className="text-sm text-muted-foreground max-w-md leading-relaxed">
+                QuantPraxus'a hoş geldin. Bugünkü hedeflerine odaklan, ilerlemeni takip et.
+              </p>
+            </div>
+
+            {/* YKS status chip — contextual detail */}
+            <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl border border-border/20 bg-card/30 shrink-0">
+              <Target className="h-4 w-4 text-primary/70" />
+              <div className="flex flex-col">
+                <span className="text-[11px] text-muted-foreground font-medium">YKS Hedefi</span>
+                <span className="text-sm font-semibold text-foreground">2027 · Sayısal</span>
+              </div>
+            </div>
           </div>
 
+          {/* Countdown — editorial information panel */}
           <CountdownWidget />
         </div>
       </section>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 space-y-6">
-        {/* Calendar + Today's tasks */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+      <main ref={sectionRef} className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-10 space-y-6">
+
+        {/* Calendar + Today's tasks — unified dashboard section */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-5 reveal">
           {/* Calendar */}
-          <div className="lg:col-span-3 rounded-2xl border border-border/40 bg-card/50 backdrop-blur-sm p-5 flex flex-col">
-            <div className="flex items-center justify-between mb-5">
-              <h3 className="text-base font-semibold text-foreground flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-primary" />
-                Takvim
-              </h3>
+          <div className="lg:col-span-3 flex flex-col">
+            <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-primary/70" />
+                <h3 className="text-sm font-semibold text-foreground">Takvim</h3>
+              </div>
+              <div className="flex items-center gap-3">
                 {/* Report button */}
-                <div className="relative mr-1">
+                <div className="relative">
                   <button
                     onClick={() => {
                       if (!isReportButtonUnlocked) {
@@ -313,45 +342,47 @@ export default function Homepage() {
                         toast({ title: "Kilit kapatıldı", description: "Rapor gönderme kilitlendi.", duration: 1500 });
                       }
                     }}
-                    className={`absolute -top-2 -right-2 z-10 p-1 rounded-full transition-all ${isReportButtonUnlocked ? "bg-emerald-500 hover:bg-emerald-600" : "bg-red-500 hover:bg-red-600"} hover:scale-110 cursor-pointer shadow-sm`}
+                    className={`absolute -top-1 -right-1 z-10 p-0.5 rounded-full transition-all ${isReportButtonUnlocked ? "bg-emerald-500 hover:bg-emerald-600" : "bg-red-500 hover:bg-red-600"} cursor-pointer shadow-sm`}
                     title={isReportButtonUnlocked ? "Kilidi Kapat" : "Kilidi Aç"}
                   >
-                    {isReportButtonUnlocked ? <Unlock className="h-3 w-3 text-white" /> : <Lock className="h-3 w-3 text-white" />}
+                    {isReportButtonUnlocked ? <Unlock className="h-2.5 w-2.5 text-white" /> : <Lock className="h-2.5 w-2.5 text-white" />}
                   </button>
                   <button
                     onClick={() => isReportButtonUnlocked && setShowReportModal(true)}
                     disabled={!isReportButtonUnlocked}
-                    className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-all min-w-[180px] ${
+                    className={`px-2.5 py-1 rounded-md border text-[11px] font-medium transition-all min-w-[140px] ${
                       isReportButtonUnlocked
-                        ? "border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 cursor-pointer"
-                        : "border-border/40 bg-muted/30 text-muted-foreground/50 cursor-not-allowed"
+                        ? "border-primary/20 bg-primary/5 text-primary hover:bg-primary/10 cursor-pointer"
+                        : "border-border/20 bg-muted/15 text-muted-foreground/50 cursor-not-allowed"
                     }`}
                   >
                     <div className="font-semibold">Rapor Gönder</div>
-                    <div className="font-mono tabular-nums text-[10px] mt-0.5" id="month-countdown">Loading...</div>
+                    <div className="font-mono tabular-nums text-[9px] mt-0.5 text-muted-foreground" id="month-countdown">Loading...</div>
                   </button>
                 </div>
 
-                <Button variant="ghost" size="sm" onClick={() => navigateMonth("prev")} className="h-8 w-8 p-0">
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <div className="text-xs font-medium text-muted-foreground px-2 py-1 min-w-[120px] text-center">
-                  {new Date(displayYear, displayMonth).toLocaleDateString("tr-TR", { month: "long", year: "numeric" })}
+                <div className="flex items-center gap-0.5">
+                  <button onClick={() => navigateMonth("prev")} className="p-1 rounded-md hover:bg-muted/50 transition-colors">
+                    <ChevronLeft className="h-3.5 w-3.5 text-muted-foreground" />
+                  </button>
+                  <span className="text-xs font-medium text-foreground px-1.5 py-0.5 min-w-[95px] text-center">
+                    {new Date(displayYear, displayMonth).toLocaleDateString("tr-TR", { month: "long", year: "numeric" })}
+                  </span>
+                  <button onClick={() => navigateMonth("next")} className="p-1 rounded-md hover:bg-muted/50 transition-colors">
+                    <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
+                  </button>
                 </div>
-                <Button variant="ghost" size="sm" onClick={() => navigateMonth("next")} className="h-8 w-8 p-0">
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
               </div>
             </div>
 
-            {/* Calendar grid */}
-            <div className="space-y-2">
-              <div className="grid grid-cols-7 gap-1.5 mb-2">
+            {/* Calendar grid — compact */}
+            <div className="space-y-1.5">
+              <div className="grid grid-cols-7 gap-0.5 mb-0.5">
                 {["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"].map((d) => (
-                  <div key={d} className="text-center text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60 py-1">{d}</div>
+                  <div key={d} className="text-center text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/40 py-1">{d}</div>
                 ))}
               </div>
-              <div className="grid grid-cols-7 gap-1.5">
+              <div className="grid grid-cols-7 gap-0.5">
                 {calendarDays.map((date, i) => {
                   const isCur = date.getMonth() === displayMonth;
                   const isTd = date.getDate() === today && isCur && displayYear === currentYear && displayMonth === currentMonth;
@@ -362,33 +393,33 @@ export default function Homepage() {
                     <button
                       key={i}
                       onClick={() => handleDateClick(date)}
-                      className={`relative aspect-square flex flex-col items-center justify-center text-sm font-medium rounded-lg transition-all duration-200 ${
+                      className={`relative flex flex-col items-center justify-center text-[13px] font-medium rounded-md transition-all duration-150 h-9 ${
                         isTd
-                          ? "bg-primary text-primary-foreground shadow-sm"
+                          ? "bg-primary text-primary-foreground"
                           : isSel
-                          ? "bg-primary/10 text-primary ring-1 ring-primary/30"
+                          ? "bg-primary/10 text-primary ring-1 ring-primary/15"
                           : isCur
-                          ? "text-foreground hover:bg-muted/60"
-                          : "text-muted-foreground/30 hover:text-muted-foreground/50"
+                          ? "text-foreground hover:bg-muted/30"
+                          : "text-muted-foreground/20 hover:text-muted-foreground/35"
                       }`}
                       data-testid={`calendar-day-${date.getDate()}`}
                     >
                       <span>{date.getDate()}</span>
-                      {hasAct && !isTd && <span className="w-1 h-1 rounded-full bg-primary/60 mt-0.5" />}
+                      {hasAct && !isTd && <span className="w-1 h-1 rounded-full bg-primary/50 mt-0.5" />}
                     </button>
                   );
                 })}
               </div>
             </div>
 
-            {/* Selected date panel */}
+            {/* Selected date panel — editorial, flat */}
             {selectedDate && (
-              <div className="mt-5 pt-5 border-t border-border/40 flex-1 min-h-0 overflow-y-auto custom-scrollbar">
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-sm font-semibold text-foreground">
+              <div className="mt-5 pt-4 border-t border-border/15 flex-1 min-h-0 overflow-y-auto custom-scrollbar max-h-[320px]">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-[13px] font-semibold text-foreground">
                     {new Date(selectedDate + "T12:00:00").toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric", weekday: "long" })}
                   </h4>
-                  <span className="text-xs font-medium text-muted-foreground px-2 py-0.5 rounded-full bg-muted/50">
+                  <span className="text-[11px] font-medium text-muted-foreground/60 px-1.5 py-0.5">
                     {calendarData?.daysRemaining && calendarData.daysRemaining > 0
                       ? `${calendarData.daysRemaining} gün sonra`
                       : calendarData?.daysRemaining === 0 ? "Bugün" : `${Math.abs(calendarData?.daysRemaining || 0)} gün önce`}
@@ -398,32 +429,30 @@ export default function Homepage() {
                 {(() => {
                   if (isFuture) {
                     return (
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between px-3 py-2.5 rounded-lg border border-border/50 bg-muted/30">
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between px-2.5 py-2 rounded-md border border-border/20 bg-muted/15">
                           <span className="text-xs font-medium text-muted-foreground">Planlanan Aktiviteler</span>
                           <span className="text-sm font-bold text-foreground tabular-nums">{calendarData?.tasksCount || 0}</span>
                         </div>
                         {calendarData?.tasks && calendarData.tasks.length > 0 ? (
-                          <div className="space-y-2">
+                          <div className="space-y-1.5">
                             {calendarData.tasks.slice(0, showAllTasks ? undefined : 3).map((task) => (
-                              <div key={task.id} className="flex items-center justify-between px-3 py-2 rounded-lg border border-border/40 bg-card/40">
-                                <div className="flex items-center gap-2 text-sm min-w-0">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-primary/60 shrink-0" />
+                              <div key={task.id} className="flex items-center justify-between px-2.5 py-1.5 rounded-md border border-border/15 bg-card/20">
+                                <div className="flex items-center gap-2 text-[13px] min-w-0">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-primary/50 shrink-0" />
                                   <span className="font-medium text-foreground truncate">{task.title}</span>
                                 </div>
-                                <div className="flex items-center gap-2 text-xs shrink-0">
-                                  <span className="text-muted-foreground">{task.priority === "high" ? "Yüksek" : task.priority === "medium" ? "Orta" : "Düşük"}</span>
-                                </div>
+                                <span className="text-[11px] text-muted-foreground shrink-0">{task.priority === "high" ? "Yüksek" : task.priority === "medium" ? "Orta" : "Düşük"}</span>
                               </div>
                             ))}
                             {calendarData.tasks.length > 3 && (
-                              <button onClick={() => setShowAllTasks(!showAllTasks)} className="text-xs font-medium text-primary hover:text-primary/80 px-3 py-1.5 rounded-md transition-colors" data-testid="button-show-more-tasks">
-                                {showAllTasks ? "Daha az göster" : `${calendarData.tasks.length - 3} görev daha`}
+                              <button onClick={() => setShowAllTasks(!showAllTasks)} className="text-[11px] font-medium text-primary hover:text-primary/80 px-2.5 py-1 transition-colors" data-testid="button-show-more-tasks">
+                                {showAllTasks ? "Daha az" : `${calendarData.tasks.length - 3} görev daha`}
                               </button>
                             )}
                           </div>
                         ) : (
-                          <p className="text-xs text-muted-foreground text-center py-4">Bu tarihe planlanmış görev yok.</p>
+                          <p className="text-xs text-muted-foreground text-center py-3">Bu tarihe planlanmış görev yok.</p>
                         )}
                       </div>
                     );
@@ -431,17 +460,14 @@ export default function Homepage() {
 
                   if (selectedActivities.total === 0) {
                     return (
-                      <div className="flex flex-col items-center justify-center py-10 text-center">
-                        <div className="w-12 h-12 rounded-full bg-muted/40 flex items-center justify-center mb-3">
-                          <TrendingUp className="h-5 w-5 text-muted-foreground/50" />
-                        </div>
-                        <p className="text-sm text-muted-foreground">{isToday ? "Bugün henüz aktivite yok." : "Bu tarihte aktivite yok."}</p>
+                      <div className="flex flex-col items-center justify-center py-6 text-center">
+                        <p className="text-[13px] text-muted-foreground">{isToday ? "Bugün henüz aktivite yok." : "Bu tarihte aktivite yok."}</p>
                       </div>
                     );
                   }
 
                   return (
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                       <StatGrid activities={selectedActivities} />
                       <PerformanceBar total={selectedActivities.performanceTotal} />
                       <StudyHoursRow studyHours={selectedActivities.studyHours} />
@@ -464,15 +490,15 @@ export default function Homepage() {
             )}
           </div>
 
-          {/* Today's tasks */}
+          {/* Today's tasks — compact */}
           <div className="lg:col-span-2">
             <TodaysTasksWidget />
           </div>
         </div>
 
-        {/* Weather */}
-        <div>
-          <EnhancedWeatherWidget />
+        {/* Weather — secondary, compact strip */}
+        <div className="reveal">
+          <CompactWeatherWidget />
         </div>
       </main>
 
@@ -514,7 +540,7 @@ export default function Homepage() {
                   { label: "Çalışma Saati", value: `${weekStudy} saat`, span: true },
                 ];
                 return stats.map((s) => (
-                  <div key={s.label} className={`rounded-lg border border-border/50 bg-muted/30 p-3 ${s.span ? "col-span-2" : ""}`}>
+                  <div key={s.label} className={`rounded-lg border border-border/30 bg-muted/20 p-3 ${s.span ? "col-span-2" : ""}`}>
                     <div className="text-xs text-muted-foreground mb-1">{s.label}</div>
                     <div className="text-2xl font-bold text-foreground tabular-nums">{s.value}</div>
                   </div>
@@ -522,7 +548,7 @@ export default function Homepage() {
               })()}
             </div>
 
-            <div className="p-4 rounded-lg border border-border/50 bg-muted/30">
+            <div className="p-4 rounded-lg border border-border/30 bg-muted/20">
               <Label className="text-sm font-medium mb-2 block">Rapor Gönderilecek E-Posta Adresi</Label>
               <Input type="email" value="Belirlediğiniz e-posta adresine rapor gönderilecektir" disabled className="bg-muted/30 text-muted-foreground blur-[2px] cursor-not-allowed" />
               <p className="text-xs text-muted-foreground mt-2">E-posta adresinize detaylı rapor gönderilecek.</p>
@@ -542,9 +568,15 @@ export default function Homepage() {
         </DialogContent>
       </Dialog>
 
-      <footer className="border-t border-border/40 mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-xs text-muted-foreground">
-          © {new Date().getFullYear()}-2026 QuantPraxus. Tüm hakları saklıdır.
+      {/* Footer — minimal editorial */}
+      <footer className="border-t border-border/15 mt-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex items-center justify-between">
+          <span className="text-[11px] text-muted-foreground/50">
+            © {new Date().getFullYear()}-2027 QuantPraxus
+          </span>
+          <span className="text-[11px] text-muted-foreground/35 hidden sm:inline">
+            YKS hazırlık platformu
+          </span>
         </div>
       </footer>
     </div>
