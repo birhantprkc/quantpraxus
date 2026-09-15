@@ -71,20 +71,48 @@ const CenteredWelcomeSection = memo(function CenteredWelcomeSection() {
   }, [currentTime]);
 
   return (
-    <div className="text-center space-y-4">
-      <h1 className="text-3xl font-bold text-foreground">
-        Hoşgeldiniz, QuantPraxus
-      </h1>
-      <div className="flex items-center justify-center gap-2">
-        <Clock className="h-5 w-5 text-muted-foreground" />
-        <span className="text-4xl font-bold font-mono tabular-nums text-foreground" data-testid="text-time-center">
-          {timeStr}
-        </span>
+    <div className="space-y-8">
+      {/* Hoşgeldin Mesajı */}
+      <div className="space-y-2">
+        <h1 className="text-5xl font-black bg-gradient-to-r from-purple-600 via-violet-700 to-black dark:from-purple-400 dark:via-violet-500 dark:to-gray-300 bg-clip-text text-transparent">
+          Hoşgeldiniz QuantPraxus
+        </h1>
       </div>
-      <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-        <span data-testid="text-date-center">{dateStr}</span>
-        <span>·</span>
-        <span>Afyonkarahisar</span>
+      
+      {/* Ortalanmış Saat ve Saat Göstergesi */}
+      <div className="flex flex-col items-center space-y-6">
+        {/* Zaman ve Saat Konteyneri - Mükemmel Ortalanmış */}
+        <div className="flex items-center justify-center space-x-6">
+          {/* Geliştirilmiş Saat İkonu - Zaman ile Ortalanmış */}
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/30 via-violet-600/30 to-black/40 rounded-3xl blur-2xl animate-pulse"></div>
+            <div className="relative w-20 h-20 bg-black/10 dark:bg-purple-950/20 backdrop-blur-xl border border-purple-500/20 dark:border-purple-400/20 rounded-3xl flex items-center justify-center shadow-2xl">
+              <Clock className="h-12 w-12 text-purple-600 dark:text-purple-400 drop-shadow-lg" />
+            </div>
+          </div>
+          
+          {/* Mor-Siyah Gradyanlı Geliştirilmiş Saat Göstergesi - Ortalanmış */}
+          <div className="text-8xl font-black bg-gradient-to-r from-purple-600 via-violet-700 to-black dark:from-purple-400 dark:via-violet-500 dark:to-gray-300 bg-clip-text text-transparent font-mono tracking-tighter drop-shadow-lg" data-testid="text-time-center">
+            {timeStr}
+          </div>
+        </div>
+        
+        {/* Stilize Tarih ve Konum - Sola Hizalı ve Ortalanmış */}
+        <div className="flex items-center justify-center space-x-4 text-2xl font-semibold">
+          <div className="flex items-center space-x-3">
+            <div className="w-3 h-3 rounded-full bg-gradient-to-r from-purple-500 to-violet-600 shadow-lg animate-pulse"></div>
+            <span className="bg-gradient-to-r from-purple-800 to-black dark:from-purple-300 dark:to-gray-200 bg-clip-text text-transparent font-bold" data-testid="text-date-center">
+              {dateStr}
+            </span>
+          </div>
+          <span className="text-muted-foreground/50">•</span>
+          <div className="flex items-center space-x-2 text-muted-foreground">
+            <span className="text-lg">📍</span>
+            <span className="font-bold bg-gradient-to-r from-purple-600 to-violet-700 dark:from-purple-400 dark:to-violet-500 bg-clip-text text-transparent">
+              Afyonkarahisar
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -571,7 +599,7 @@ export default function Homepage() {
       
 
       {/* Saatli Ortaya Alınmış Karşılama Bölümü */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
         <CenteredWelcomeSection />
       </div>
       
@@ -580,9 +608,9 @@ export default function Homepage() {
         {/* Üst Sıra - Takvim ve Bugünün Görevleri Yan Yana */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-6 items-stretch">
           {/* Modern Takvim Widget'ı - 3 sütun kaplar (biraz daha büyük) */}
-          <div className="lg:col-span-3 bg-card rounded-lg border border-border p-4 h-full flex flex-col">
+          <div className="lg:col-span-3 bg-gradient-to-br from-card to-card/80 rounded-2xl border border-border/50 p-4 shadow-lg backdrop-blur-sm transition-all duration-300 hover:shadow-xl h-full flex flex-col">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-base font-semibold text-foreground flex items-center">
+              <h3 className="text-xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent flex items-center">
                 <Calendar className="h-5 w-5 mr-3 text-primary" />
                 Takvim
               </h3>
@@ -715,11 +743,11 @@ export default function Homepage() {
                       onClick={() => handleDateClick(date)}
                       className={`relative aspect-square flex flex-col items-center justify-center text-sm font-medium rounded-xl transition-all duration-200 transform hover:scale-105 ${
                         isToday
-                          ? "bg-primary text-primary-foreground"
+                          ? "bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-lg shadow-primary/25 scale-105"
                           : isSelected
-                          ? "bg-accent text-accent-foreground ring-1 ring-primary/40"
+                          ? "bg-gradient-to-br from-accent to-accent/80 text-accent-foreground ring-2 ring-primary/50 shadow-md"
                           : isCurrentMonth
-                          ? "hover:bg-secondary cursor-pointer text-foreground"
+                          ? "hover:bg-gradient-to-br hover:from-secondary hover:to-secondary/80 cursor-pointer text-foreground hover:shadow-md border border-transparent hover:border-border/50"
                           : "text-muted-foreground/30 cursor-pointer hover:text-muted-foreground/50"
                       }`}
                       data-testid={`calendar-day-${date.getDate()}`}
@@ -829,12 +857,12 @@ export default function Homepage() {
                               </div>
                               <div className="w-full bg-muted rounded-full h-2">
                                 <div 
-                                  className="bg-primary h-2 rounded-full transition-all duration-500"
+                                  className="bg-gradient-to-r from-primary to-primary/80 h-2 rounded-full transition-all duration-500" 
                                   style={{ width: `${Math.min((activities.performanceTotal / 10) * 100, 100)}%` }}
                                 ></div>
                               </div>
                               <div className="text-xs text-muted-foreground mt-1">
-                                {activities.performanceTotal >= 10 ? "Güzel bir gün" : activities.performanceTotal >= 5 ? "İyi gidiyor" : "Daha fazla çalışabilirsin"}
+                                {activities.performanceTotal >= 10 ? "Müthiş bir gün! 🎉" : activities.performanceTotal >= 5 ? "İyi gidiyor! 👍" : "Daha fazla çalışabiliriz! 💪"}
                               </div>
                             </div>
                             
@@ -1315,12 +1343,12 @@ export default function Homepage() {
                               </div>
                               <div className="w-full bg-muted rounded-full h-2">
                                 <div 
-                                  className="bg-primary h-2 rounded-full transition-all duration-500"
+                                  className="bg-gradient-to-r from-primary to-primary/80 h-2 rounded-full transition-all duration-500" 
                                   style={{ width: `${Math.min((activities.performanceTotal / 10) * 100, 100)}%` }}
                                 ></div>
                               </div>
                               <div className="text-xs text-muted-foreground mt-1">
-                                {activities.performanceTotal >= 10 ? "Güzel bir gün" : activities.performanceTotal >= 5 ? "İyi gidiyor" : "Daha fazla çalışabilirsin"}
+                                {activities.performanceTotal >= 10 ? "Müthiş bir gün! 🎉" : activities.performanceTotal >= 5 ? "İyi gidiyor! 👍" : "Daha fazla çalışabiliriz! 💪"}
                               </div>
                             </div>
                             
@@ -1839,7 +1867,7 @@ export default function Homepage() {
       <Dialog open={showReportModal} onOpenChange={setShowReportModal}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="text-lg font-bold text-foreground">
+            <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
               📊 Haftalık Aktivite Raporu
             </DialogTitle>
             <DialogDescription>
@@ -1850,7 +1878,7 @@ export default function Homepage() {
           <div className="space-y-4">
             {/* İstatistikler */}
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-muted/30 p-4 rounded-md border border-border">
+              <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/30 dark:to-purple-900/20 p-4 rounded-lg border border-purple-200 dark:border-purple-800">
                 <div className="text-sm text-muted-foreground mb-1">Toplam Aktivite (Son 7 Gün)</div>
                 <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">
                   {(() => {
@@ -1873,7 +1901,7 @@ export default function Homepage() {
                 </div>
               </div>
               
-              <div className="bg-muted/30 p-4 rounded-md border border-border">
+              <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/30 dark:to-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
                 <div className="text-sm text-muted-foreground mb-1">Tamamlanan Görevler (Son 7 Gün)</div>
                 <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
                   {(() => {
@@ -1906,7 +1934,7 @@ export default function Homepage() {
                 </div>
               </div>
               
-              <div className="bg-muted/30 p-4 rounded-md border border-border">
+              <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/30 dark:to-green-900/20 p-4 rounded-lg border border-green-200 dark:border-green-800">
                 <div className="text-sm text-muted-foreground mb-1">Çözülen Soru Sayısı (Son 7 Gün)</div>
                 <div className="text-3xl font-bold text-green-600 dark:text-green-400">
                   {(() => {
@@ -1941,7 +1969,7 @@ export default function Homepage() {
                 </div>
               </div>
               
-              <div className="bg-muted/30 p-4 rounded-md border border-border">
+              <div className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950/30 dark:to-orange-900/20 p-4 rounded-lg border border-orange-200 dark:border-orange-800">
                 <div className="text-sm text-muted-foreground mb-1">Toplam Denemeler (Son 7 Gün)</div>
                 <div className="text-3xl font-bold text-orange-600 dark:text-orange-400">
                   {(() => {
@@ -1956,7 +1984,7 @@ export default function Homepage() {
                 </div>
               </div>
               
-              <div className="bg-muted/30 p-4 rounded-md border border-border col-span-2">
+              <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-950/30 dark:to-indigo-900/20 p-4 rounded-lg border border-indigo-200 dark:border-indigo-800 col-span-2">
                 <div className="text-sm text-muted-foreground mb-1">Toplam Çalışma Saati (Son 7 Gün)</div>
                 <div className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">
                   {(() => {

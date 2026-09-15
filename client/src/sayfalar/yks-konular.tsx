@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, createElement } from "react";
 import { Header } from "@/bilesenler/baslik";
 import { tytTopics, aytTopics, type SubjectTopics } from "@/data/yks-konular";
 import { BookOpen, Award, AlertCircle } from "lucide-react";
 
+// Önemli konular mapping
 const importantTopicsMap: { [key: string]: string[] } = {
   "TYT Türkçe": ["Paragraf"],
   "TYT Matematik": ["Problemler"],
@@ -22,12 +23,14 @@ export default function YKSKonular() {
 
   const getYears = (topics: SubjectTopics) => {
     if (topics.topics.length === 0) return [];
-    return Object.keys(topics.topics[0].years).sort((a, b) => parseInt(b) - parseInt(a));
+    const firstTopic = topics.topics[0];
+    return Object.keys(firstTopic.years).sort((a, b) => parseInt(b) - parseInt(a));
   };
 
   const getTotalByYear = (topics: SubjectTopics) => {
     const years = getYears(topics);
     const totals: { [year: string]: number } = {};
+    
     years.forEach(year => {
       let total = 0;
       topics.topics.forEach(topic => {
@@ -38,92 +41,163 @@ export default function YKSKonular() {
       });
       totals[year] = total;
     });
+    
     return totals;
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
       <Header />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-        <div className="mb-6">
-          <h1 className="page-title flex items-center gap-2">
-            <BookOpen className="h-6 w-6 text-primary" />
-            YKS Konu Dağılımı
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">Yıllara göre hangi konudan kaç soru çıktığını gör.</p>
-        </div>
-
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* Sidebar */}
-          <div className="w-full lg:w-72 flex-shrink-0">
-            <div className="bg-card border border-border rounded-lg p-4 lg:sticky lg:top-4">
-              <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">TYT</h2>
-              <div className="space-y-1 mb-4">
-                {tytTopics.map((subject) => (
-                  <button
-                    key={subject.name}
-                    onClick={() => setSelectedSubject(subject)}
-                    className={`group w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
-                      selectedSubject?.name === subject.name
-                        ? 'bg-primary text-primary-foreground'
-                        : 'hover:bg-secondary text-foreground'
-                    }`}
-                  >
-                    <span className="text-base">{subject.icon}</span>
-                    <span>{subject.name.replace('TYT ', '')}</span>
-                  </button>
-                ))}
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex gap-6">
+          {/* Kenar çubuğu - Sol taraf konuları */}
+          <div className="w-80 flex-shrink-0">
+            <div className="bg-card/95 backdrop-saturate-150 rounded-2xl border border-border/60 shadow-xl p-6 sticky top-4">
+              {/* Simgeli Başlık */}
+              <div className="mb-7 pb-5 border-b border-border/50">
+                <div className="flex items-center gap-3.5">
+                  <div className="p-3 bg-gradient-to-br from-primary via-purple-600 to-purple-700 rounded-2xl shadow-lg shadow-primary/30">
+                    <BookOpen className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-foreground tracking-tight">Dersler</h2>
+                    <p className="text-xs text-muted-foreground font-medium mt-0.5">Hangi yıl hangi konudan kaç soru çıkmış görebileceğim alan</p>
+                  </div>
+                </div>
+              </div>
+              
+              {/* TYT ALANI */}
+              <div className="mb-7">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="h-3 w-1 bg-gradient-to-b from-primary to-primary/50 rounded-full"></div>
+                  <h3 className="text-xs font-bold text-primary uppercase tracking-widest">TYT Konuları</h3>
+                </div>
+                <div className="space-y-2">
+                  {tytTopics.map((subject) => (
+                    <button
+                      key={subject.name}
+                      onClick={() => setSelectedSubject(subject)}
+                      className={`group relative w-full text-left px-4 py-3.5 rounded-xl transition-all duration-200 flex items-center gap-3 overflow-hidden ${
+                        selectedSubject?.name === subject.name
+                          ? `bg-gradient-to-r ${subject.color} text-white shadow-xl shadow-${subject.color.split('-')[1]}-500/25 ring-2 ring-white/20`
+                          : "bg-gradient-to-br from-secondary/70 to-secondary/50 hover:from-secondary hover:to-secondary/70 text-foreground hover:shadow-md"
+                      }`}
+                    >
+                      <div className="text-2xl transition-transform group-hover:scale-110">
+                        {subject.icon}
+                      </div>
+                      <div className="flex-1">
+                        <span className="font-semibold text-sm block">{subject.name.replace('TYT ', '')}</span>
+                      </div>
+                      {selectedSubject?.name === subject.name && (
+                        <div className="flex items-center gap-1">
+                          <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" style={{ animationDelay: '0ms' }}></div>
+                          <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" style={{ animationDelay: '150ms' }}></div>
+                          <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" style={{ animationDelay: '300ms' }}></div>
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
               </div>
 
-              <div className="h-px bg-border my-3" />
+              {/* tytyi aytden bölen kısımü */}
+              <div className="relative my-7">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full h-px bg-gradient-to-r from-transparent via-border to-transparent"></div>
+                </div>
+                <div className="relative flex justify-center">
+                  <div className="px-4 bg-card">
+                    <div className="w-2 h-2 rounded-full bg-gradient-to-br from-primary to-purple-600 shadow-lg"></div>
+                  </div>
+                </div>
+              </div>
 
-              <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">AYT</h2>
-              <div className="space-y-1">
-                {aytTopics.map((subject) => (
-                  <button
-                    key={subject.name}
-                    onClick={() => setSelectedSubject(subject)}
-                    className={`group w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
-                      selectedSubject?.name === subject.name
-                        ? 'bg-primary text-primary-foreground'
-                        : 'hover:bg-secondary text-foreground'
-                    }`}
-                  >
-                    <span className="text-base">{subject.icon}</span>
-                    <span>{subject.name.replace('AYT ', '')}</span>
-                  </button>
-                ))}
+              {/* AYT Bölümü */}
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="h-3 w-1 bg-gradient-to-b from-purple-600 to-purple-600/50 rounded-full"></div>
+                  <h3 className="text-xs font-bold text-purple-600 uppercase tracking-widest">AYT Konuları</h3>
+                </div>
+                <div className="space-y-2">
+                  {aytTopics.map((subject) => (
+                    <button
+                      key={subject.name}
+                      onClick={() => setSelectedSubject(subject)}
+                      className={`group relative w-full text-left px-4 py-3.5 rounded-xl transition-all duration-200 flex items-center gap-3 overflow-hidden ${
+                        selectedSubject?.name === subject.name
+                          ? `bg-gradient-to-r ${subject.color} text-white shadow-xl shadow-${subject.color.split('-')[1]}-500/25 ring-2 ring-white/20`
+                          : "bg-gradient-to-br from-secondary/70 to-secondary/50 hover:from-secondary hover:to-secondary/70 text-foreground hover:shadow-md"
+                      }`}
+                    >
+                      <div className="text-2xl transition-transform group-hover:scale-110">
+                        {subject.icon}
+                      </div>
+                      <div className="flex-1">
+                        <span className="font-semibold text-sm block">{subject.name.replace('AYT ', '')}</span>
+                      </div>
+                      {selectedSubject?.name === subject.name && (
+                        <div className="flex items-center gap-1">
+                          <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" style={{ animationDelay: '0ms' }}></div>
+                          <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" style={{ animationDelay: '150ms' }}></div>
+                          <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" style={{ animationDelay: '300ms' }}></div>
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Main content */}
-          <div className="flex-1 min-w-0">
+          {/* ana içerik  */}
+          <div className="flex-1">
             {selectedSubject && (
-              <div className="bg-card border border-border rounded-lg overflow-hidden">
-                {/* Header */}
-                <div className="px-6 py-4 border-b border-border flex items-center gap-3">
-                  <span className="text-2xl">{selectedSubject.icon}</span>
-                  <div>
-                    <h2 className="text-lg font-bold text-foreground">{selectedSubject.name}</h2>
-                    <p className="text-xs text-muted-foreground">Yıllara göre soru dağılımı</p>
+              <div className="bg-card/95 backdrop-saturate-150 rounded-2xl border border-border/60 shadow-xl overflow-hidden">
+                {/* Başlık */}
+                <div className="relative overflow-hidden">
+                  <div className={`absolute inset-0 bg-gradient-to-r ${selectedSubject.color} opacity-95`}></div>
+                  <div className="relative p-8">
+                    <div className="flex items-center gap-5">
+                      <div className="p-4 bg-white/20 rounded-2xl shadow-lg border border-white/20">
+                        <span className="text-4xl">{selectedSubject.icon}</span>
+                      </div>
+                      <div className="flex-1">
+                        <h2 className="text-3xl font-bold text-white tracking-tight mb-1">{selectedSubject.name}</h2>
+                        <p className="text-white/90 text-sm font-medium flex items-center gap-2">
+                          <span className="inline-block w-1 h-1 bg-white/70 rounded-full"></span>
+                          Yıllara Göre Soru Dağılımı & İstatistik Analizi
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                {/* Important topics */}
+                {/* Önemli Konular Uyarısı */}
                 {importantTopicsMap[selectedSubject.name] && importantTopicsMap[selectedSubject.name].length > 0 && (
-                  <div className="mx-6 mt-4 p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/50 rounded-md">
-                    <div className="flex items-start gap-2">
-                      <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
-                      <div>
-                        <span className="text-sm font-semibold text-amber-900 dark:text-amber-200">Önemli Konular: </span>
-                        <div className="flex flex-wrap gap-1.5 mt-1.5">
-                          {importantTopicsMap[selectedSubject.name].map((topic, i) => (
-                            <span key={i} className="text-xs px-2 py-0.5 bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200 rounded border border-amber-300 dark:border-amber-700/50">
-                              {topic}
-                            </span>
-                          ))}
+                  <div className="mx-8 mt-6 mb-4">
+                    <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 border-2 border-amber-400/60 dark:border-amber-600/60 rounded-xl p-5 shadow-lg">
+                      <div className="flex items-start gap-4">
+                        <div className="flex-shrink-0 mt-0.5">
+                          <div className="p-2.5 bg-amber-500/20 rounded-lg">
+                            <AlertCircle className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+                          </div>
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-bold text-amber-900 dark:text-amber-200 text-base mb-2 flex items-center gap-2">
+                            ⭐ En Çok Değer Verilmesi Gereken Konular
+                          </h3>
+                          <div className="flex flex-wrap gap-2">
+                            {importantTopicsMap[selectedSubject.name].map((topic, index) => (
+                              <span
+                                key={index}
+                                className="inline-flex items-center px-3.5 py-1.5 bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200 rounded-lg text-sm font-semibold border border-amber-300 dark:border-amber-700 shadow-sm"
+                              >
+                                {topic}
+                              </span>
+                            ))}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -131,56 +205,79 @@ export default function YKSKonular() {
                 )}
 
                 {/* Table */}
-                <div className="overflow-x-auto mt-4">
-                  <table className="w-full text-sm">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
                     <thead>
-                      <tr className="border-b border-border">
-                        <th className="px-4 py-3 text-left font-semibold text-xs text-muted-foreground uppercase tracking-wide sticky left-0 bg-card z-10">
-                          Konu
+                      <tr className={`bg-gradient-to-r ${selectedSubject.color} bg-opacity-10`}>
+                        <th className="px-6 py-5 text-left font-bold text-sm text-foreground sticky left-0 bg-card/95 z-10 border-r border-border/30">
+                          <div className="flex items-center gap-2">
+                            <div className={`w-1 h-6 bg-gradient-to-b ${selectedSubject.color} rounded-full`}></div>
+                            KONU BAŞLIĞI
+                          </div>
                         </th>
                         {getYears(selectedSubject).map((year, idx) => (
-                          <th key={year} className={`px-3 py-3 text-center font-semibold text-xs min-w-[80px] ${idx === 0 ? 'text-primary' : 'text-muted-foreground'}`}>
-                            {year}
+                          <th key={year} className={`px-5 py-5 text-center font-bold text-sm min-w-[95px] ${
+                            idx === 0 ? 'text-primary' : 'text-foreground'
+                          }`}>
+                            <div className="flex flex-col items-center gap-1.5">
+                              <span className={idx === 0 ? 'text-base' : ''}>{year}</span>
+                              {idx === 0 && <div className={`w-10 h-1 bg-gradient-to-r ${selectedSubject.color} rounded-full`}></div>}
+                            </div>
                           </th>
                         ))}
                       </tr>
                     </thead>
                     <tbody>
                       {selectedSubject.topics.map((topic, index) => (
-                        <tr key={index} className={`border-b border-border/50 ${index % 2 === 0 ? 'bg-muted/20' : ''} hover:bg-muted/40 transition-colors`}>
-                          <td className="px-4 py-2.5 font-medium text-foreground sticky left-0 bg-inherit z-10">
-                            {topic.topic}
+                        <tr 
+                          key={index} 
+                          className={`group border-b border-border/50 transition-all ${
+                            index % 2 === 0 ? 'bg-background/50 hover:bg-muted/40' : 'bg-muted/20 hover:bg-muted/50'
+                          }`}
+                        >
+                          <td className="px-6 py-4 font-semibold text-sm text-foreground sticky left-0 bg-inherit z-10 border-r border-border/30">
+                            <div className="flex items-center gap-2.5">
+                              <div className={`w-2 h-2 rounded-full bg-gradient-to-br ${selectedSubject.color} opacity-70 group-hover:opacity-100 transition-opacity`}></div>
+                              {topic.topic}
+                            </div>
                           </td>
                           {getYears(selectedSubject).map((year, idx) => (
-                            <td key={year} className="px-3 py-2.5 text-center">
+                            <td key={year} className="px-5 py-4 text-center">
                               {topic.years[year] === "−" || !topic.years[year] ? (
-                                <span className="text-muted-foreground/30">−</span>
+                                <span className="text-muted-foreground/40 font-light">−</span>
                               ) : (
-                                <span className={`inline-flex items-center justify-center w-7 h-7 rounded text-xs font-bold tabular-nums ${
-                                  idx === 0
-                                    ? 'bg-primary text-primary-foreground'
-                                    : 'text-foreground bg-muted/50'
+                                <div className={`inline-flex items-center justify-center w-9 h-9 rounded-xl font-bold text-sm transition-all ${
+                                  idx === 0 
+                                    ? `bg-gradient-to-br ${selectedSubject.color} text-white shadow-md hover:shadow-lg hover:scale-105` 
+                                    : 'text-foreground bg-secondary hover:bg-secondary/80'
                                 }`}>
                                   {topic.years[year]}
-                                </span>
+                                </div>
                               )}
                             </td>
                           ))}
                         </tr>
                       ))}
-                      {/* Total row */}
-                      <tr className="border-t-2 border-border bg-muted/30">
-                        <td className="px-4 py-3 font-bold text-sm sticky left-0 bg-inherit z-10 flex items-center gap-2">
-                          <Award className="h-4 w-4 text-primary" />
-                          Toplam
+                      
+                      {/* Toplam Satır */}
+                      <tr className={`bg-gradient-to-r ${selectedSubject.color} font-bold`}>
+                        <td className="px-6 py-6 text-sm text-white sticky left-0 z-10 bg-inherit border-r border-white/20">
+                          <div className="flex items-center gap-3">
+                            <div className="p-1.5 bg-white/20 rounded-lg">
+                              <Award className="w-5 h-5" />
+                            </div>
+                            <span className="text-base tracking-wide">TOPLAM SORU SAYISI</span>
+                          </div>
                         </td>
                         {getYears(selectedSubject).map((year, idx) => (
-                          <td key={year} className="px-3 py-3 text-center">
-                            <span className={`inline-flex items-center justify-center min-w-[36px] h-8 px-2 rounded text-sm font-bold tabular-nums ${
-                              idx === 0 ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground'
+                          <td key={year} className="px-5 py-6 text-center">
+                            <div className={`inline-flex items-center justify-center min-w-[45px] h-11 px-4 rounded-xl font-bold text-base shadow-lg transition-transform hover:scale-105 ${
+                              idx === 0 
+                                ? 'bg-white text-primary' 
+                                : 'bg-white/25 text-white border border-white/30'
                             }`}>
                               {getTotalByYear(selectedSubject)[year]}
-                            </span>
+                            </div>
                           </td>
                         ))}
                       </tr>
@@ -188,21 +285,30 @@ export default function YKSKonular() {
                   </table>
                 </div>
 
-                {/* Footer note */}
-                <div className="px-4 py-3 border-t border-border text-xs text-muted-foreground text-center">
-                  "−" işareti o yıl konudan soru çıkmadığını gösterir.
+                {/* en alttaki footer */}
+                <div className="relative px-6 py-5 bg-gradient-to-r from-muted/40 via-muted/30 to-muted/40 border-t border-border/50">
+                  <div className="flex items-center justify-center gap-2 text-sm">
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary/60"></div>
+                      <span className="font-semibold text-foreground">Not:</span>
+                      <span>Tabloda <span className="font-mono text-foreground/80">"−"</span> işareti o yıl konudan soru çıkmadığını gösterir.</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
           </div>
         </div>
       </div>
-
+      
       <footer className="bg-muted/30 border-t border-border mt-16">
-        <div className="max-w-7xl mx-auto px-4 py-4 text-center text-xs text-muted-foreground">
-          © 2025-2026 QuantPraxus. Tüm hakları saklıdır.
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="text-center text-sm text-muted-foreground">
+            © 2025-2026 QuantPraxus. Tüm hakları saklıdır.
+          </div>
         </div>
       </footer>
     </div>
   );
 }
+
