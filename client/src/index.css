@@ -1,13 +1,13 @@
 /*
- * Quantpraxus - Sınav Analiz Sistemi
+ * Quantpraxus - Design System
+ * Professional, data-focused, distraction-free
  */
-
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Sayfa kaymasını önle - sürükleme sırasında scroll oluşmasın */
+/* --- Page layout --- */
 html, body {
   overflow-x: hidden;
   max-width: 100vw;
@@ -17,63 +17,7 @@ body {
   position: relative;
 }
 
-/* Heatmap bugünkü gün için yumuşak mor parıldama nefes efekti */
-@keyframes purpleGlow {
-  0%, 100% {
-    box-shadow: 0 0 8px rgba(147, 51, 234, 0.6), 0 0 16px rgba(147, 51, 234, 0.3);
-    opacity: 0.95;
-  }
-  50% {
-    box-shadow: 0 0 16px rgba(147, 51, 234, 0.9), 0 0 24px rgba(147, 51, 234, 0.5);
-    opacity: 1;
-  }
-}
-
-/* Hafif solunum animasyonu  */
-@keyframes breathingPulse {
-  0%, 100% {
-    opacity: 0.9;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-/* Hafif solunum animasyonu */
-@keyframes breathing {
-  0%, 100% {
-    opacity: 0.85;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-/* Görevler için renkli nefes efekti animasyonu */
-@keyframes breathe {
-  0%, 100% {
-    transform: scale(1);
-    filter: brightness(1);
-  }
-  50% {
-    transform: scale(1.01);
-    filter: brightness(1.05);
-  }
-}
-
-/* Tamamlanmamış görevler için kenarlık yanıp sönmesi */
-@keyframes pulse-border {
-  0%, 100% {
-    border-color: rgba(139, 92, 246, 0.3);
-    box-shadow: 0 0 0 rgba(139, 92, 246, 0);
-  }
-  50% {
-    border-color: rgba(139, 92, 246, 0.8);
-    box-shadow: 0 0 12px rgba(139, 92, 246, 0.3);
-  }
-}
-
-/* Reduced motion desteği - erişilebilirlik */
+/* --- Reduced motion support --- */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -85,137 +29,81 @@ body {
   }
 }
 
-/* Performans optimizasyonları için hafif animasyonlar */
-.animate-breathing-pulse {
-  animation: breathingPulse 3s ease-in-out infinite;
-}
-
-.animate-breathing {
-  animation: breathing 3s ease-in-out infinite;
-}
-
-/* Optimize edilmiş hover efektleri - Hafif */
-.hover-scale {
-  transition: transform 0.2s ease;
-}
-
-.hover-scale:hover {
-  transform: scale(1.02);
-}
-
-/* Optimize edilmiş buton geçişleri  */
-.btn-optimized {
-  transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), 
-              box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-  backface-visibility: hidden;
-}
-
-.btn-optimized:hover {
-  transform: translateY(-1px) translateZ(0);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  will-change: transform, box-shadow;
-}
-
-.btn-optimized:active {
-  transform: translateY(0) translateZ(0);
-  transition: transform 0.05s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
+/* --- Color tokens --- */
 :root {
   --background: hsl(0 0% 98%);
-  --foreground: hsl(0 0% 20%);
+  --foreground: hsl(222 22% 12%);
   --card: hsl(0 0% 100%);
-  --card-foreground: hsl(0 0% 25%);
+  --card-foreground: hsl(222 22% 12%);
   --popover: hsl(0 0% 100%);
-  --popover-foreground: hsl(0 0% 25%);
-  --primary: hsl(271 70% 55%);
+  --popover-foreground: hsl(222 22% 12%);
+  --primary: hsl(256 70% 48%);
   --primary-foreground: hsl(0 0% 100%);
-  --secondary: hsl(240 5% 96%);
-  --secondary-foreground: hsl(0 0% 30%);
-  --muted: hsl(240 5% 94%);
-  --muted-foreground: hsl(0 0% 50%);
-  --accent: hsl(271 60% 95%);
-  --accent-foreground: hsl(0 0% 30%);
-  --destructive: hsl(0 75% 58%);
+  --secondary: hsl(220 14% 95%);
+  --secondary-foreground: hsl(222 22% 25%);
+  --muted: hsl(220 14% 94%);
+  --muted-foreground: hsl(220 10% 45%);
+  --accent: hsl(256 30% 94%);
+  --accent-foreground: hsl(256 50% 30%);
+  --destructive: hsl(0 72% 52%);
   --destructive-foreground: hsl(0 0% 100%);
-  --border: hsl(240 6% 90%);
-  --input: hsl(240 5% 96%);
-  --ring: hsl(271 70% 55%);
-  --chart-1: hsl(203.8863 88.2845% 53.1373%);
-  --chart-2: hsl(159.7826 100% 36.0784%);
-  --chart-3: hsl(42.0290 92.8251% 56.2745%);
-  --chart-4: hsl(147.1429 78.5047% 41.9608%);
-  --chart-5: hsl(341.4894 75.2000% 50.9804%);
+  --border: hsl(220 14% 90%);
+  --input: hsl(220 14% 93%);
+  --ring: hsl(256 70% 48%);
+  --chart-1: hsl(220 85% 55%);
+  --chart-2: hsl(160 70% 40%);
+  --chart-3: hsl(40 90% 50%);
+  --chart-4: hsl(350 75% 55%);
+  --chart-5: hsl(270 60% 55%);
   --sidebar: hsl(0 0% 100%);
-  --sidebar-foreground: hsl(0 0% 15%);
-  --sidebar-primary: hsl(271 76% 53%);
+  --sidebar-foreground: hsl(222 22% 12%);
+  --sidebar-primary: hsl(256 70% 48%);
   --sidebar-primary-foreground: hsl(0 0% 100%);
-  --sidebar-accent: hsl(271 76% 96%);
-  --sidebar-accent-foreground: hsl(0 0% 15%);
-  --sidebar-border: hsl(240 6% 90%);
-  --sidebar-ring: hsl(271 76% 53%);
-  --font-sans: "Inter", "system-ui", "sans-serif";
+  --sidebar-accent: hsl(256 20% 95%);
+  --sidebar-accent-foreground: hsl(222 22% 12%);
+  --sidebar-border: hsl(220 14% 90%);
+  --sidebar-ring: hsl(256 70% 48%);
+  --font-sans: "Inter", system-ui, sans-serif;
   --font-serif: Georgia, serif;
-  --font-mono: Menlo, monospace;
+  --font-mono: "JetBrains Mono", "Menlo", monospace;
   --radius: 0.5rem;
-  --shadow-2xs: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --shadow-xs: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --shadow-sm: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 1px 2px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --shadow: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 1px 2px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --shadow-md: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 2px 4px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --shadow-lg: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 4px 6px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --shadow-xl: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 8px 10px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --shadow-2xl: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
 }
 
 .dark {
-  /* Karanlık Tema - Mor-Beyaz-Siyah */
-  --background: hsl(0 0% 9%);
-  --foreground: hsl(0 0% 100%);
-  --card: hsl(0 0% 12%);
-  --card-foreground: hsl(0 0% 100%);
-  --popover: hsl(0 0% 12%);
-  --popover-foreground: hsl(0 0% 100%);
-  --primary: hsl(271 76% 65%);
+  --background: hsl(222 20% 8%);
+  --foreground: hsl(220 15% 95%);
+  --card: hsl(222 18% 11%);
+  --card-foreground: hsl(220 15% 95%);
+  --popover: hsl(222 18% 11%);
+  --popover-foreground: hsl(220 15% 95%);
+  --primary: hsl(256 70% 60%);
   --primary-foreground: hsl(0 0% 100%);
-  --secondary: hsl(0 0% 18%);
-  --secondary-foreground: hsl(0 0% 100%);
-  --muted: hsl(0 0% 18%);
-  --muted-foreground: hsl(0 0% 65%);
-  --accent: hsl(271 50% 25%);
-  --accent-foreground: hsl(0 0% 100%);
-  --destructive: hsl(0 84.2% 60.2%);
+  --secondary: hsl(222 16% 17%);
+  --secondary-foreground: hsl(220 15% 92%);
+  --muted: hsl(222 16% 16%);
+  --muted-foreground: hsl(220 12% 60%);
+  --accent: hsl(256 25% 18%);
+  --accent-foreground: hsl(256 30% 85%);
+  --destructive: hsl(0 70% 55%);
   --destructive-foreground: hsl(0 0% 100%);
-  --border: hsl(0 0% 25%);
-  --input: hsl(0 0% 25%);
-  --ring: hsl(271 76% 65%);
-  --chart-1: hsl(203.8863 88.2845% 53.1373%);
-  --chart-2: hsl(159.7826 100% 36.0784%);
-  --chart-3: hsl(42.0290 92.8251% 56.2745%);
-  --chart-4: hsl(147.1429 78.5047% 41.9608%);
-  --chart-5: hsl(341.4894 75.2000% 50.9804%);
-  --sidebar: hsl(0 0% 9%);
-  --sidebar-foreground: hsl(0 0% 100%);
-  --sidebar-primary: hsl(271 76% 65%);
-  --sidebar-primary-foreground: hsl(0 0% 0%);
-  --sidebar-accent: hsl(0 0% 18%);
-  --sidebar-accent-foreground: hsl(0 0% 100%);
-  --sidebar-border: hsl(0 0% 25%);
-  --sidebar-ring: hsl(271 76% 65%);
-  --font-sans: "Inter", "system-ui", "sans-serif";
-  --font-serif: Georgia, serif;
-  --font-mono: Menlo, monospace;
-  --radius: 0.5rem;
-  --shadow-2xs: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --shadow-xs: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --shadow-sm: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 1px 2px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --shadow: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 1px 2px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --shadow-md: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 2px 4px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --shadow-lg: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 4px 6px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --shadow-xl: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 8px 10px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --shadow-2xl: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00);
+  --border: hsl(222 14% 22%);
+  --input: hsl(222 14% 20%);
+  --ring: hsl(256 70% 60%);
+  --chart-1: hsl(220 85% 60%);
+  --chart-2: hsl(160 70% 45%);
+  --chart-3: hsl(40 90% 55%);
+  --chart-4: hsl(350 75% 60%);
+  --chart-5: hsl(270 60% 65%);
+  --sidebar: hsl(222 20% 8%);
+  --sidebar-foreground: hsl(220 15% 95%);
+  --sidebar-primary: hsl(256 70% 60%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(222 16% 17%);
+  --sidebar-accent-foreground: hsl(220 15% 95%);
+  --sidebar-border: hsl(222 14% 22%);
+  --sidebar-ring: hsl(256 70% 60%);
 }
 
 @layer base {
@@ -234,193 +122,118 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-  
-  /* Tüm containerları sınırla */
+
   #root {
     overflow-x: hidden;
     max-width: 100vw;
   }
 }
 
+/* --- Component utilities (shared design language) --- */
+@layer components {
+  /* Page heading */
+  .page-title {
+    @apply text-2xl font-bold text-foreground tracking-tight;
+  }
+
+  /* Section heading */
+  .section-title {
+    @apply text-lg font-semibold text-foreground;
+  }
+
+  /* Subtle card hover — no transform, no glow */
+  .card-base {
+    @apply bg-card border border-border rounded-lg;
+  }
+
+  /* Button focus ring (consistent) */
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+  }
+
+  /* Tab trigger base */
+  .tab-base {
+    @apply inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors text-muted-foreground;
+  }
+  .tab-active {
+    @apply bg-primary text-primary-foreground;
+  }
+  .tab-inactive {
+    @apply hover:bg-secondary hover:text-foreground;
+  }
+
+  /* Stat block (compact, data-first) */
+  .stat-block {
+    @apply rounded-lg border border-border bg-muted/30 p-4 text-center;
+  }
+  .stat-value {
+    @apply text-2xl font-bold text-foreground tabular-nums;
+  }
+  .stat-label {
+    @apply text-xs font-medium text-muted-foreground mt-1;
+  }
+
+  /* Badge (flat, semantic) */
+  .badge-base {
+    @apply inline-flex items-center px-2 py-0.5 text-xs font-medium rounded;
+  }
+
+  /* Filter pill */
+  .filter-pill {
+    @apply px-3 py-1.5 text-xs font-medium rounded-md transition-colors text-muted-foreground hover:bg-secondary hover:text-foreground;
+  }
+  .filter-pill-active {
+    @apply bg-primary text-primary-foreground;
+  }
+}
+
 @layer utilities {
-  /* ultra-smooth task animasyonları */
+  /* Task row — subtle shadow on hover, no transform */
   .task-item {
-    transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), 
-                box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-    backface-visibility: hidden;
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
   }
-  
   .task-item:hover {
-    transform: translateY(-1px) translateZ(0);
-    box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.1);
-    will-change: transform, box-shadow;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   }
-  
   .dark .task-item:hover {
-    box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.3);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
   }
 
-  /* Hava Durumu Animasyon Efektleri */
-  .rain-animation {
-    background: linear-gradient(transparent 0%, rgba(59, 130, 246, 0.1) 100%);
-    position: relative;
-  }
-
-  .rain-animation::before {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background-image: 
-      linear-gradient(90deg, rgba(59, 130, 246, 0.3) 1px, transparent 1px),
-      linear-gradient(180deg, rgba(59, 130, 246, 0.3) 1px, transparent 1px);
-    background-size: 20px 20px;
-    animation: rain-fall 2s linear infinite;
-    opacity: 0.3;
-  }
-
-  .sun-rays-animation {
-    background: radial-gradient(circle, rgba(251, 191, 36, 0.1) 0%, transparent 70%);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .sun-rays-animation::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: conic-gradient(from 0deg, transparent, rgba(251, 191, 36, 0.1), transparent, rgba(251, 191, 36, 0.05), transparent);
-    animation: sun-rotation 20s linear infinite;
-    pointer-events: none;
-  }
-
-  @keyframes rain-fall {
-    0% {
-      background-position: 0 -20px;
-    }
-    100% {
-      background-position: 0 20px;
-    }
-  }
-
-  @keyframes sun-rotation {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
-  }
-
-  /* Kışın kar yağarsa hava durumu için kar animasyonu */
-  .snow-animation {
-    background: linear-gradient(transparent 0%, rgba(219, 234, 254, 0.1) 100%);
-    position: relative;
-  }
-
-  .snow-animation::before {
-    content: '❄️ ❅ ❄️ ❅ ❄️';
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    font-size: 1rem;
-    color: rgba(219, 234, 254, 0.5);
-    animation: snow-fall 8s linear infinite;
-    white-space: nowrap;
-    overflow: hidden;
-  }
-
-  @keyframes snow-fall {
-    0% {
-      transform: translateY(-100px);
-    }
-    100% {
-      transform: translateY(100px);
-    }
+  /* Tabular numbers for data displays */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
   }
 }
 
-/* Modern Purple Scrollbar - 165Hz Optimized */
-/* Webkit tabanlı tarayıcılar için (Chrome, Safari, Edge) */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: hsl(248 39% 39% / 0.1);
-  border-radius: 4px;
-  margin: 2px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, hsl(271 76% 53%), hsl(271 76% 45%));
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(139, 92, 246, 0.3);
-  transition: background 0.15s cubic-bezier(0.4, 0, 0.2, 1), 
-              box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, hsl(271 76% 45%), hsl(271 76% 40%));
-  box-shadow: 0 4px 8px rgba(139, 92, 246, 0.4);
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:active {
-  background: linear-gradient(135deg, hsl(271 76% 40%), hsl(271 76% 35%));
-  box-shadow: 0 2px 4px rgba(139, 92, 246, 0.5);
-}
-
-.custom-scrollbar::-webkit-scrollbar-corner {
-  background: transparent;
-}
-
-/* Firefox için scrollbar styling */
-.custom-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: hsl(271 76% 53%) hsl(248 39% 39% / 0.1);
-}
-
-/* Global scrollbar - 165Hz ready, buttery smooth */
+/* --- Scrollbar (subtle, neutral) --- */
 * {
   scrollbar-width: thin;
-  scrollbar-color: hsl(271 76% 53%) hsl(248 39% 39% / 0.1);
+  scrollbar-color: hsl(220 10% 70%) transparent;
 }
 
 *::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
 }
 
 *::-webkit-scrollbar-track {
-  background: hsl(248 39% 39% / 0.1);
-  border-radius: 4px;
-  margin: 2px;
-}
-
-*::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, hsl(271 76% 53%), hsl(271 76% 45%));
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(139, 92, 246, 0.3);
-  transition: background 0.15s cubic-bezier(0.4, 0, 0.2, 1),
-              box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-*::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, hsl(271 76% 45%), hsl(271 76% 40%));
-  box-shadow: 0 4px 8px rgba(139, 92, 246, 0.4);
-}
-
-*::-webkit-scrollbar-thumb:active {
-  background: linear-gradient(135deg, hsl(271 76% 40%), hsl(271 76% 35%));
-  box-shadow: 0 2px 4px rgba(139, 92, 246, 0.5);
-}
-
-*::-webkit-scrollbar-corner {
   background: transparent;
 }
 
+*::-webkit-scrollbar-thumb {
+  background: hsl(220 10% 75%);
+  border-radius: 4px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: hsl(220 10% 60%);
+}
 
+.dark * {
+  scrollbar-color: hsl(220 12% 35%) transparent;
+}
+.dark *::-webkit-scrollbar-thumb {
+  background: hsl(220 12% 35%);
+}
+.dark *::-webkit-scrollbar-thumb:hover {
+  background: hsl(220 12% 45%);
+}

@@ -8,8 +8,7 @@ import {
   ToastTitle,
   ToastViewport,
 } from "@/bilesenler/arayuz/toast"
-//en sevdiğim en basit toaster ya hep böyle kod yazayım
-//GELİŞTİRİLECEK
+
 export function Toaster() {
   const { toasts } = useToast()
 
@@ -44,7 +43,6 @@ function ToastProgressBar({ duration }: { duration: number }) {
       const elapsed = Date.now() - startTime
       const remaining = Math.max(0, 100 - (elapsed / duration) * 100)
       setProgress(remaining)
-      
       if (remaining === 0) {
         clearInterval(interval)
       }
@@ -54,10 +52,10 @@ function ToastProgressBar({ duration }: { duration: number }) {
   }, [duration])
 
   return (
-    <div className="absolute bottom-0 left-0 right-0 h-1 bg-muted/30 overflow-hidden">
-      <div 
-        className="h-full bg-gradient-to-r from-purple-500 to-purple-600 transition-all duration-100 ease-linear origin-left"
-        style={{ 
+    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-muted/30 overflow-hidden">
+      <div
+        className="h-full bg-primary transition-all duration-100 ease-linear origin-left"
+        style={{
           width: `${progress}%`,
           transformOrigin: 'left center'
         }}
@@ -65,4 +63,3 @@ function ToastProgressBar({ duration }: { duration: number }) {
     </div>
   )
 }
-
