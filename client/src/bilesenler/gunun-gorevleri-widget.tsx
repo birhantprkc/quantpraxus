@@ -138,10 +138,10 @@ export function TodaysTasksWidget() {
         <div className="flex flex-col items-center justify-center px-5 py-5 text-center">
           <p className="text-sm font-medium text-foreground/80">Henüz planlanmış bir çalışma yok.</p>
           <p className="text-xs text-muted-foreground mt-1">Bugünün planını oluştur.</p>
-          <Link href="/timer">
-            <button className="mt-2.5 inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors">
+          <Link href="/tasks">
+            <button className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors border border-primary/20 rounded-lg px-3 py-1.5 hover:bg-primary/5">
               Plan oluştur
-              <ArrowRight className="w-3 h-3" />
+              <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </Link>
         </div>

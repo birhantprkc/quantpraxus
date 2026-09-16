@@ -93,7 +93,7 @@ interface CountdownColumnProps {
 
 function CountdownColumn({ label, fullName, examDate, days, hours, minutes, seconds, fmt, borderClass }: CountdownColumnProps) {
   return (
-    <div className={`px-5 py-6 sm:px-8 sm:py-7 ${borderClass}`}>
+    <div className={`px-5 py-4 sm:px-7 sm:py-5 ${borderClass}`}>
       {/* Label + date */}
       <div className="flex items-center justify-between mb-5">
         <span className="text-sm font-bold tracking-tight text-foreground">{label}</span>

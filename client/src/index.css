@@ -262,6 +262,18 @@ body {
     -webkit-backdrop-filter: blur(14px) saturate(1.2);
   }
 
+  /* Glass surface — scrolled state (stronger blur, more opaque) */
+  .glass-surface-scrolled {
+    background: hsl(255 14% 9% / 0.88);
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  }
+  .light .glass-surface-scrolled {
+    background: hsl(40 30% 96% / 0.90);
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  }
+
   /* Ambient background — graphite depth with subtle violet ambient light */
   .ambient-bg {
     position: relative;

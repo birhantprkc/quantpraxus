@@ -66,7 +66,16 @@ export function Header({ hideClockOnHomepage = false, onReportCounterClick }: He
   }, []);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12);
+    let ticking = false;
+    const onScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          setScrolled(window.scrollY > 12);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
@@ -85,6 +94,19 @@ export function Header({ hideClockOnHomepage = false, onReportCounterClick }: He
   };
 
   const isHomepage = location === '/';
+
+  const getYksTarget = (): string => {
+    const alan = localStorage.getItem('yksAlan');
+    const year = localStorage.getItem('yksYear') || '2027';
+    const alanMap: Record<string, string> = {
+      'sayisal': 'Sayısal',
+      'esit-agirlik': 'Eşit Ağırlık',
+      'sozel': 'Sözel',
+      'dil': 'Dil',
+    };
+    const alanText = alan ? (alanMap[alan] || alan) : 'Sayısal';
+    return `${year} · ${alanText}`;
+  };
 
   return (
     <header className="sticky top-0 z-50">
@@ -124,13 +146,13 @@ export function Header({ hideClockOnHomepage = false, onReportCounterClick }: He
         </div>
       )}
 
-      {/* Floating premium navbar */}
-      <div className={`px-4 sm:px-6 transition-all duration-300 ${scrolled ? 'pt-3' : 'pt-5'}`}>
+      {/* Floating glass navbar — two scroll states */}
+      <div className={`px-4 sm:px-6 transition-all duration-300 ease-out ${scrolled ? 'pt-2.5' : 'pt-5'}`}>
         <nav
-          className={`max-w-6xl mx-auto rounded-[18px] border transition-all duration-300 ${
+          className={`max-w-6xl mx-auto border transition-all duration-300 ease-out ${
             scrolled
-              ? 'glass-surface border-border/30 shadow-md py-1.5'
-              : 'glass-surface border-border/20 shadow-sm py-2'
+              ? 'glass-surface-scrolled rounded-[16px] border-border/30 shadow-lg py-1.5'
+              : 'glass-surface rounded-[18px] border-border/20 shadow-md py-2.5'
           }`}
         >
           <div className="flex items-center justify-between px-4 sm:px-5">
@@ -145,7 +167,7 @@ export function Header({ hideClockOnHomepage = false, onReportCounterClick }: He
               </Link>
 
               {/* Desktop nav */}
-              <nav className="hidden lg:flex items-center gap-0.5">
+              <nav className={`hidden lg:flex items-center transition-all duration-300 ${scrolled ? 'gap-0' : 'gap-0.5'}`}>
                 {NAV_ITEMS.map((item) => {
                   const Icon = item.icon;
                   const isActive = location === item.href;
@@ -218,7 +240,7 @@ export function Header({ hideClockOnHomepage = false, onReportCounterClick }: He
                     </div>
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-foreground truncate">QuantPraxus</p>
-                      <p className="text-[11px] text-muted-foreground truncate">YKS Adayı · 2027 Hedefi</p>
+                      <p className="text-[11px] text-muted-foreground truncate">YKS Adayı · {getYksTarget()}</p>
                     </div>
                   </div>
                   <DropdownMenuSeparator />

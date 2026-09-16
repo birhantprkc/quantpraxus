@@ -263,6 +263,19 @@ export default function Homepage() {
   }, []);
 
   // Hero greeting
+  const getYksTarget = (): string => {
+    const alan = localStorage.getItem('yksAlan');
+    const year = localStorage.getItem('yksYear') || '2027';
+    const alanMap: Record<string, string> = {
+      'sayisal': 'Sayısal',
+      'esit-agirlik': 'Eşit Ağırlık',
+      'sozel': 'Sözel',
+      'dil': 'Dil',
+    };
+    const alanText = alan ? (alanMap[alan] || alan) : 'Sayısal';
+    return `${year} · ${alanText}`;
+  };
+
   const greeting = useMemo(() => {
     const h = new Date(new Date().toLocaleString("en-US", { timeZone: "Europe/Istanbul" })).getHours();
     if (h < 6) return "İyi geceler";
@@ -302,33 +315,33 @@ export default function Homepage() {
               </p>
             </div>
 
-            {/* YKS target chip */}
+            {/* YKS target chip — dynamic from localStorage */}
             <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl border border-border/20 bg-card/30 shrink-0">
               <Target className="h-4 w-4 text-primary/70" />
               <div className="flex flex-col">
                 <span className="text-[11px] text-muted-foreground font-medium">YKS Hedefi</span>
-                <span className="text-sm font-semibold text-foreground">2027 · Sayısal</span>
+                <span className="text-sm font-semibold text-foreground">{getYksTarget()}</span>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Countdown — premium YKS dashboard section */}
+      {/* Countdown + Motivation — combined premium section */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-5">
-        <div className="animate-fade-in-up" style={{ animationDelay: "0.05s" }}>
-          <CountdownWidget />
-        </div>
-      </section>
-
-      {/* Motivation quote — editorial micro-section */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-6">
-        <div className="flex items-start gap-3 py-3 border-t border-border/10 animate-fade-in" style={{ animationDelay: "0.1s" }}>
-          <Quote className="h-3.5 w-3.5 text-primary/40 shrink-0 mt-1" />
-          <div className="flex flex-col gap-0.5">
-            <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground/40 font-medium">
-              Günün Sözü
-            </span>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 animate-fade-in-up" style={{ animationDelay: "0.05s" }}>
+          {/* Countdown — takes 2 columns */}
+          <div className="lg:col-span-2">
+            <CountdownWidget />
+          </div>
+          {/* Motivation quote — editorial card, 1 column */}
+          <div className="flex flex-col justify-center px-5 py-6 rounded-xl border border-border/20 bg-card/30">
+            <div className="flex items-center gap-2 mb-3">
+              <Quote className="h-3.5 w-3.5 text-primary/50 shrink-0" />
+              <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground/50 font-medium">
+                Günün Sözü
+              </span>
+            </div>
             <MotivationQuoteInline />
           </div>
         </div>
@@ -366,7 +379,7 @@ export default function Homepage() {
                   <button
                     onClick={() => isReportButtonUnlocked && setShowReportModal(true)}
                     disabled={!isReportButtonUnlocked}
-                    className={`px-2.5 py-1 rounded-md border text-[11px] font-medium transition-all min-w-[140px] ${
+                    className={`px-3 py-1.5 rounded-md border text-[11px] font-medium transition-all min-w-[120px] ${
                       isReportButtonUnlocked
                         ? "border-primary/20 bg-primary/5 text-primary hover:bg-primary/10 cursor-pointer"
                         : "border-border/20 bg-muted/15 text-muted-foreground/50 cursor-not-allowed"
@@ -513,8 +526,18 @@ export default function Homepage() {
         </div>
 
         {/* Weather — secondary, compact expandable strip */}
-        <div className="reveal">
-          <CompactWeatherWidget />
+        <div className="reveal grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <div className="lg:col-span-2">
+            <CompactWeatherWidget />
+          </div>
+          {/* Quick stats summary — fills 3rd column */}
+          <div className="flex flex-col justify-center px-5 py-4 rounded-xl border border-border/20 bg-card/30">
+            <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground/50 font-medium mb-2">Bu Hafta</span>
+            <div className="flex items-baseline gap-2">
+              <span className="text-2xl font-bold tabular-nums text-foreground">{allQuestionLogs.filter(l => { const d = new Date(); const w = new Date(d); w.setDate(d.getDate() - 6); return l.study_date >= w.toISOString().split('T')[0]; }).reduce((s, l) => s + (parseInt(l.correct_count) || 0) + (parseInt(l.wrong_count) || 0), 0)}</span>
+              <span className="text-xs text-muted-foreground">çözülen soru</span>
+            </div>
+          </div>
         </div>
       </main>
 
