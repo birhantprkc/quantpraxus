@@ -7,12 +7,10 @@ interface CountdownWidgetProps {
 export function CountdownWidget({ className = "" }: CountdownWidgetProps) {
   const [tytCountdown, setTytCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [aytCountdown, setAytCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-  const [ydtCountdown, setYdtCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
     const tytDate = new Date("2027-06-19T10:15:00+03:00");
     const aytDate = new Date("2027-06-20T10:15:00+03:00");
-    const ydtDate = new Date("2027-06-20T15:45:00+03:00");
 
     const updateCountdown = () => {
       const now = new Date();
@@ -32,7 +30,6 @@ export function CountdownWidget({ className = "" }: CountdownWidgetProps) {
 
       setTytCountdown(calc(tytDate));
       setAytCountdown(calc(aytDate));
-      setYdtCountdown(calc(ydtDate));
     };
 
     updateCountdown();
@@ -45,15 +42,13 @@ export function CountdownWidget({ className = "" }: CountdownWidgetProps) {
   return (
     <div className={className}>
       {/* Section header */}
-      <div className="flex items-center justify-between mb-5">
-        <div className="flex items-baseline gap-3">
-          <h3 className="text-lg font-bold tracking-tight text-foreground">YKS 2027</h3>
-          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Sınava Kalan Zaman</span>
-        </div>
+      <div className="flex items-baseline gap-3 mb-5">
+        <h3 className="text-lg font-bold tracking-tight text-foreground">YKS 2027</h3>
+        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Sınava Kalan Zaman</span>
       </div>
 
-      {/* Editorial information panel — no card nesting */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 border-t border-b border-border/40">
+      {/* Two-column premium information panel */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 border-t border-b border-border/40">
         {/* TYT */}
         <CountdownColumn
           label="TYT"
@@ -77,19 +72,6 @@ export function CountdownWidget({ className = "" }: CountdownWidgetProps) {
           minutes={aytCountdown.minutes}
           seconds={aytCountdown.seconds}
           fmt={fmt}
-          borderClass="sm:border-r border-border/40 border-t sm:border-t-0 border-border/40"
-        />
-
-        {/* YDT */}
-        <CountdownColumn
-          label="YDT"
-          fullName="Yabancı Dil Testi"
-          examDate="20 Haziran 2027"
-          days={ydtCountdown.days}
-          hours={ydtCountdown.hours}
-          minutes={ydtCountdown.minutes}
-          seconds={ydtCountdown.seconds}
-          fmt={fmt}
           borderClass="border-t sm:border-t-0 border-border/40"
         />
       </div>
@@ -111,7 +93,7 @@ interface CountdownColumnProps {
 
 function CountdownColumn({ label, fullName, examDate, days, hours, minutes, seconds, fmt, borderClass }: CountdownColumnProps) {
   return (
-    <div className={`px-5 py-6 sm:px-6 sm:py-7 ${borderClass}`}>
+    <div className={`px-5 py-6 sm:px-8 sm:py-7 ${borderClass}`}>
       {/* Label + date */}
       <div className="flex items-center justify-between mb-5">
         <span className="text-sm font-bold tracking-tight text-foreground">{label}</span>

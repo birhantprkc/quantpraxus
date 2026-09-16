@@ -115,7 +115,7 @@ export function TodaysTasksWidget() {
 
   if (isLoading) {
     return (
-      <div className="rounded-xl border border-border/20 bg-card/30 p-5">
+      <div className="rounded-xl border border-border/20 bg-card/30 p-4">
         <h3 className="text-sm font-semibold text-foreground mb-3">Bugünün Planı</h3>
         <div className="animate-pulse space-y-2.5">
           <div className="h-4 bg-muted/40 rounded w-3/4"></div>
@@ -127,7 +127,7 @@ export function TodaysTasksWidget() {
 
   return (
     <div className="rounded-xl border border-border/20 bg-card/30 flex flex-col relative overflow-hidden">
-      <div className="flex items-center justify-between px-4 pt-4 pb-2.5">
+      <div className="flex items-center justify-between px-4 pt-3.5 pb-2">
         <h3 className="text-sm font-semibold text-foreground">Bugünün Planı</h3>
         <div className="text-xs font-medium text-muted-foreground tabular-nums" data-testid="text-today-counts">
           {completedCount}/{totalCount}
@@ -135,11 +135,11 @@ export function TodaysTasksWidget() {
       </div>
 
       {tasks.length === 0 ? (
-        <div className="flex-1 flex flex-col items-center justify-center px-5 py-8 text-center">
+        <div className="flex flex-col items-center justify-center px-5 py-5 text-center">
           <p className="text-sm font-medium text-foreground/80">Henüz planlanmış bir çalışma yok.</p>
           <p className="text-xs text-muted-foreground mt-1">Bugünün planını oluştur.</p>
           <Link href="/timer">
-            <button className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors">
+            <button className="mt-2.5 inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors">
               Plan oluştur
               <ArrowRight className="w-3 h-3" />
             </button>
@@ -148,7 +148,7 @@ export function TodaysTasksWidget() {
       ) : (
         <>
           {/* Progress bar — subtle */}
-          <div className="px-4 pb-2.5">
+          <div className="px-4 pb-2">
             <div className="w-full bg-muted/40 rounded-full h-[3px]">
               <div
                 className="bg-primary h-[3px] rounded-full transition-all duration-500"
@@ -157,7 +157,7 @@ export function TodaysTasksWidget() {
             </div>
           </div>
 
-          <div className={`space-y-2 flex-1 min-h-0 px-4 pb-4 ${tasks.length > 6 ? 'overflow-y-auto max-h-[340px]' : ''} custom-scrollbar`}>
+          <div className={`space-y-2 px-4 pb-3.5 ${tasks.length > 6 ? 'overflow-y-auto max-h-[280px]' : ''} custom-scrollbar`}>
             {tasks.map((task) => (
               <div
                 key={task.id}
@@ -219,7 +219,7 @@ export function TodaysTasksWidget() {
           </div>
 
           {tasks.length > 0 && (
-            <div className="px-4 py-2.5 border-t border-border/10">
+            <div className="px-4 py-2 border-t border-border/10">
               <div className="text-[11px] text-muted-foreground text-center">
                 {completedCount === totalCount
                   ? "Tüm görevler tamamlandı"

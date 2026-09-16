@@ -1,10 +1,9 @@
 import {
   Sun, Moon, Clock, Home, BarChart3, Calculator, Timer, BookOpen,
-  Minus, Square, X, ChevronLeft, ChevronRight, RotateCw, Menu, Settings, LogOut, ChevronDown
+  Minus, Square, X, ChevronLeft, ChevronRight, RotateCw, Menu, Settings, LogOut, ChevronDown, Target, User
 } from "lucide-react";
 import { useTheme } from "./tema-saglayici";
 import { useState, useEffect } from "react";
-import { MotivationalQuote } from "./motivasyon-sozu";
 import { Link, useLocation } from "wouter";
 import {
   DropdownMenu,
@@ -125,30 +124,21 @@ export function Header({ hideClockOnHomepage = false, onReportCounterClick }: He
         </div>
       )}
 
-      {/* Motivation strip — editorial, minimal */}
-      <div className="border-b border-border/20 bg-background/50 backdrop-blur-sm">
-        <div className="py-2 px-6">
-          <div className="max-w-6xl mx-auto">
-            <MotivationalQuote />
-          </div>
-        </div>
-      </div>
-
       {/* Floating premium navbar */}
-      <div className={`px-4 sm:px-6 transition-all duration-300 ${scrolled ? 'pt-2' : 'pt-3'}`}>
+      <div className={`px-4 sm:px-6 transition-all duration-300 ${scrolled ? 'pt-3' : 'pt-5'}`}>
         <nav
-          className={`max-w-6xl mx-auto rounded-2xl border transition-all duration-300 ${
+          className={`max-w-6xl mx-auto rounded-[18px] border transition-all duration-300 ${
             scrolled
-              ? 'glass-surface border-border/30 shadow-sm py-1.5'
-              : 'glass-surface border-border/20 py-2'
+              ? 'glass-surface border-border/30 shadow-md py-1.5'
+              : 'glass-surface border-border/20 shadow-sm py-2'
           }`}
         >
           <div className="flex items-center justify-between px-4 sm:px-5">
 
             {/* Left: Logo + desktop nav */}
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-5">
               <Link href="/" className="flex items-center gap-2.5 group shrink-0">
-                <img src="/app-icon.png" alt="QuantPraxus" className="h-6 w-6 rounded-lg transition-transform duration-200 group-hover:scale-105" />
+                <img src="/app-icon.png" alt="QuantPraxus" className="h-7 w-7 rounded-lg transition-transform duration-200 group-hover:scale-105" />
                 <span className="text-[15px] font-bold tracking-tight text-foreground hidden sm:block">
                   QuantPraxus
                 </span>
@@ -214,7 +204,7 @@ export function Header({ hideClockOnHomepage = false, onReportCounterClick }: He
                     data-testid="button-emoji-picker"
                   >
                     <span className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-[11px] font-bold shrink-0">
-                      Q
+                      B
                     </span>
                     <span className="text-xs font-semibold text-foreground hidden sm:block">Aday</span>
                     <ChevronDown className="w-3 h-3 text-muted-foreground" />
@@ -224,7 +214,7 @@ export function Header({ hideClockOnHomepage = false, onReportCounterClick }: He
                   {/* Profile header */}
                   <div className="px-3 py-2.5 flex items-center gap-3">
                     <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-xs shrink-0">
-                      Q
+                      B
                     </div>
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-foreground truncate">QuantPraxus</p>
@@ -233,11 +223,11 @@ export function Header({ hideClockOnHomepage = false, onReportCounterClick }: He
                   </div>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem className="cursor-pointer rounded-md px-3 py-1.5 text-sm">
-                    <Settings className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
+                    <User className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
                     Profil
                   </DropdownMenuItem>
                   <DropdownMenuItem className="cursor-pointer rounded-md px-3 py-1.5 text-sm">
-                    <Settings className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
+                    <Target className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
                     Hedefler
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={toggleTheme} className="cursor-pointer rounded-md px-3 py-1.5 text-sm">

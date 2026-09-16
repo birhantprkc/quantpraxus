@@ -3,7 +3,7 @@ import { Header } from "@/bilesenler/baslik";
 import { CompactWeatherWidget } from "@/bilesenler/kompakt-hava-durumu";
 import { CountdownWidget } from "@/bilesenler/geri-sayim-widget";
 import { TodaysTasksWidget } from "@/bilesenler/gunun-gorevleri-widget";
-import { Calendar, ChevronLeft, ChevronRight, Mail, Lock, Unlock, Target } from "lucide-react";
+import { Calendar, ChevronLeft, ChevronRight, Mail, Lock, Unlock, Target, Quote } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Task, QuestionLog, ExamResult } from "@shared/sema";
 import { Button } from "@/bilesenler/arayuz/button";
@@ -286,15 +286,14 @@ export default function Homepage() {
     <div className="min-h-screen bg-background ambient-bg transition-colors duration-300">
       <Header hideClockOnHomepage />
 
-      {/* Hero + Countdown — editorial composition */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-10 pb-6">
-        <div className="flex flex-col gap-6 animate-fade-in-up">
-          {/* Greeting + contextual status */}
-          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-            <div className="flex flex-col gap-1.5">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary/70">
-                {formattedDate}
-              </span>
+      {/* Hero — greeting + YKS target */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 pb-5">
+        <div className="flex flex-col gap-1.5 animate-fade-in-up">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary/70">
+            {formattedDate}
+          </span>
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+            <div className="flex flex-col gap-1">
               <h1 className="text-3xl sm:text-4xl lg:text-[2.75rem] font-bold tracking-tight text-foreground leading-[1.1]">
                 {greeting}.
               </h1>
@@ -303,7 +302,7 @@ export default function Homepage() {
               </p>
             </div>
 
-            {/* YKS status chip — contextual detail */}
+            {/* YKS target chip */}
             <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl border border-border/20 bg-card/30 shrink-0">
               <Target className="h-4 w-4 text-primary/70" />
               <div className="flex flex-col">
@@ -312,19 +311,36 @@ export default function Homepage() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
 
-          {/* Countdown — editorial information panel */}
+      {/* Countdown — premium YKS dashboard section */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-5">
+        <div className="animate-fade-in-up" style={{ animationDelay: "0.05s" }}>
           <CountdownWidget />
         </div>
       </section>
 
-      <main ref={sectionRef} className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-10 space-y-6">
+      {/* Motivation quote — editorial micro-section */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-6">
+        <div className="flex items-start gap-3 py-3 border-t border-border/10 animate-fade-in" style={{ animationDelay: "0.1s" }}>
+          <Quote className="h-3.5 w-3.5 text-primary/40 shrink-0 mt-1" />
+          <div className="flex flex-col gap-0.5">
+            <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground/40 font-medium">
+              Günün Sözü
+            </span>
+            <MotivationQuoteInline />
+          </div>
+        </div>
+      </section>
 
-        {/* Calendar + Today's tasks — unified dashboard section */}
+      <main ref={sectionRef} className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-10 space-y-5">
+
+        {/* Calendar + Today's tasks — dashboard section */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-5 reveal">
           {/* Calendar */}
           <div className="lg:col-span-3 flex flex-col">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4 text-primary/70" />
                 <h3 className="text-sm font-semibold text-foreground">Takvim</h3>
@@ -357,7 +373,7 @@ export default function Homepage() {
                     }`}
                   >
                     <div className="font-semibold">Rapor Gönder</div>
-                    <div className="font-mono tabular-nums text-[9px] mt-0.5 text-muted-foreground" id="month-countdown">Loading...</div>
+                    <div className="tabular-nums text-[9px] mt-0.5 text-muted-foreground" id="month-countdown">Loading...</div>
                   </button>
                 </div>
 
@@ -376,10 +392,10 @@ export default function Homepage() {
             </div>
 
             {/* Calendar grid — compact */}
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               <div className="grid grid-cols-7 gap-0.5 mb-0.5">
                 {["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"].map((d) => (
-                  <div key={d} className="text-center text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/40 py-1">{d}</div>
+                  <div key={d} className="text-center text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/40 py-0.5">{d}</div>
                 ))}
               </div>
               <div className="grid grid-cols-7 gap-0.5">
@@ -393,7 +409,7 @@ export default function Homepage() {
                     <button
                       key={i}
                       onClick={() => handleDateClick(date)}
-                      className={`relative flex flex-col items-center justify-center text-[13px] font-medium rounded-md transition-all duration-150 h-9 ${
+                      className={`relative flex flex-col items-center justify-center text-[12px] font-medium rounded-md transition-all duration-150 h-8 ${
                         isTd
                           ? "bg-primary text-primary-foreground"
                           : isSel
@@ -414,8 +430,8 @@ export default function Homepage() {
 
             {/* Selected date panel — editorial, flat */}
             {selectedDate && (
-              <div className="mt-5 pt-4 border-t border-border/15 flex-1 min-h-0 overflow-y-auto custom-scrollbar max-h-[320px]">
-                <div className="flex items-center justify-between mb-3">
+              <div className="mt-4 pt-3 border-t border-border/15 flex-1 min-h-0 overflow-y-auto custom-scrollbar max-h-[280px]">
+                <div className="flex items-center justify-between mb-2.5">
                   <h4 className="text-[13px] font-semibold text-foreground">
                     {new Date(selectedDate + "T12:00:00").toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric", weekday: "long" })}
                   </h4>
@@ -429,7 +445,7 @@ export default function Homepage() {
                 {(() => {
                   if (isFuture) {
                     return (
-                      <div className="space-y-3">
+                      <div className="space-y-2.5">
                         <div className="flex items-center justify-between px-2.5 py-2 rounded-md border border-border/20 bg-muted/15">
                           <span className="text-xs font-medium text-muted-foreground">Planlanan Aktiviteler</span>
                           <span className="text-sm font-bold text-foreground tabular-nums">{calendarData?.tasksCount || 0}</span>
@@ -460,14 +476,14 @@ export default function Homepage() {
 
                   if (selectedActivities.total === 0) {
                     return (
-                      <div className="flex flex-col items-center justify-center py-6 text-center">
+                      <div className="flex flex-col items-center justify-center py-4 text-center">
                         <p className="text-[13px] text-muted-foreground">{isToday ? "Bugün henüz aktivite yok." : "Bu tarihte aktivite yok."}</p>
                       </div>
                     );
                   }
 
                   return (
-                    <div className="space-y-3">
+                    <div className="space-y-2.5">
                       <StatGrid activities={selectedActivities} />
                       <PerformanceBar total={selectedActivities.performanceTotal} />
                       <StudyHoursRow studyHours={selectedActivities.studyHours} />
@@ -490,13 +506,13 @@ export default function Homepage() {
             )}
           </div>
 
-          {/* Today's tasks — compact */}
+          {/* Today's tasks — content-based height */}
           <div className="lg:col-span-2">
             <TodaysTasksWidget />
           </div>
         </div>
 
-        {/* Weather — secondary, compact strip */}
+        {/* Weather — secondary, compact expandable strip */}
         <div className="reveal">
           <CompactWeatherWidget />
         </div>
@@ -580,5 +596,27 @@ export default function Homepage() {
         </div>
       </footer>
     </div>
+  );
+}
+
+function MotivationQuoteInline() {
+  const quote = useMemo(() => {
+    const QUOTES = [
+      "Her adım sizi hedefinize biraz daha yaklaştırır.",
+      "Disiplin, motivasyondan daha güçlüdür.",
+      "Başarı bir gecede gelmez, ama her gece çalışarak yaklaşırsınız.",
+      "Bugün ekilen tohum, yarın hasat edilir.",
+      "Azim dağları yerinden oynatır.",
+      "Damlaya damlaya göl olur.",
+      "Çalışanın elini bereketli kılar Tanrı.",
+      "Bugünün yorgunluğu, yarının başarısıdır.",
+    ];
+    return QUOTES[Math.floor(Math.random() * QUOTES.length)];
+  }, []);
+
+  return (
+    <p className="text-sm text-muted-foreground italic leading-relaxed">
+      &ldquo;{quote}&rdquo;
+    </p>
   );
 }
