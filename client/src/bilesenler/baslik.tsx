@@ -1,5 +1,5 @@
 import {
-  Sun, Moon, Clock, Home, BarChart3, Calculator, Timer, BookOpen,
+  Sun, Moon, Clock, Home, BarChart3, Calculator, Timer, BookOpen, ListTodo,
   Minus, Square, X, ChevronLeft, ChevronRight, RotateCw, Menu, Settings, LogOut, ChevronDown, Target, User
 } from "lucide-react";
 import { useTheme } from "./tema-saglayici";
@@ -27,6 +27,7 @@ interface HeaderProps {
 
 const NAV_ITEMS = [
   { href: "/", label: "Anasayfa", icon: Home, testId: "link-homepage" },
+  { href: "/tasks", label: "Görevler", icon: ListTodo, testId: "link-tasks" },
   { href: "/net-calculator", label: "Net Hesapla", icon: Calculator, testId: "link-net-calculator" },
   { href: "/timer", label: "Sayaç", icon: Timer, testId: "link-timer" },
   { href: "/yks-konular", label: "YKS Konuları", icon: BookOpen, testId: "link-yks-konular" },
