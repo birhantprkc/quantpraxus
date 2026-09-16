@@ -163,20 +163,24 @@ body {
   }
 
   /* Stat block (compact, data-first) */
-  .stat-block {
-    @apply rounded-lg border border-border bg-muted/30 p-4 text-center;
-  }
-  .stat-value {
-    @apply text-2xl font-bold text-foreground tabular-nums;
-  }
-  .stat-label {
-    @apply text-xs font-medium text-muted-foreground mt-1;
-  }
+.stat-block {
+  @apply rounded-lg border p-4 text-center;
+  border-color: hsl(var(--border));
+  background-color: hsl(var(--muted) / 0.3);
+}
 
-  /* Badge (flat, semantic) */
-  .badge-base {
-    @apply inline-flex items-center px-2 py-0.5 text-xs font-medium rounded;
-  }
+.stat-value {
+  @apply text-2xl font-bold text-foreground tabular-nums;
+}
+
+.stat-label {
+  @apply mt-1 text-xs font-medium text-muted-foreground;
+}
+
+/* Badge (flat, semantic) */
+.badge-base {
+  @apply inline-flex items-center rounded px-2 py-0.5 text-xs font-medium;
+}
 
   /* Filter pill */
   .filter-pill {
